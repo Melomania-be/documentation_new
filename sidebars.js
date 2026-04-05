@@ -48,6 +48,7 @@ const sidebars = {
         'Using the app/how-to',
       ],
     },
+    'working on the app',
   ],
 
   // But you can create a sidebar manually
