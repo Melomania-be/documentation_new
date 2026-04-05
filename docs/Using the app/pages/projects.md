@@ -1,0 +1,3 @@
+# Projects page
+![Projects page](/img/using_the_app/projects_page.png)
+This is the home page of the website, and features a list of all the projects, passed, present and future, organized by the orchestra. The buttons on top allow the user to filter project and show only the ones that are past, or the current projects (that have at least one concert or rehearsal date in the future). The button on top allows to create a new project and the limit per page can be changed, but other than that, this page is pretty straightforward.

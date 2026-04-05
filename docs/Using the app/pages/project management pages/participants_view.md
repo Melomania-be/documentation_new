@@ -1,0 +1,4 @@
+# Participants page
+![Project participants view](/img/using_the_app/project_participants1.png)
+![Project participants view](/img/using_the_app/project_participants2.png)
+This view show the list of participants in a project. The top frame is where new registrations will be shown when pending validation. To fit all specific needs, it allows the user to choose which informations to show, from the basic contact informations to the responses to the custom forms on the registration form. This way, unnecessary information can be hidden to keep the table readable. A button on the top right of this frame allows the user to manually add a participant to the project.

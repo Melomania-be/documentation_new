@@ -1,0 +1,9 @@
+# Accounting
+![Accounting page](/img/using_the_app/accounting1.png)
+![Accounting page](/img/using_the_app/accounting2.png)
+This page is the accounting tool of the app, allowing the user to record all transactions pertinent to the project and keep statistics about them. The top frame shows the current, future and total balances as well as the list of all transactions and the button to add a new one. There are three different balances because a distinction is made between transactions that are planned and ones that are actually done. This allows to reflect not only the total, long-term balance of the project, but also its current state, and what is still pending. 
+![Accounting add a transaction](/img/using_the_app/accounting_add.png)
+To create a transaction, this form needs to be filled. Every transaction has a name, a bill date (theoretical date) and a bank date (actual payment date), an amount (negative for expenses, positive for incomes), and a category (see below). The user can also attach files, like invoices. A payment can also be marked as a payment to a musician (checkbox on top) to be linked to a contact. In that case, their payment will be displayed in the participants view of the project, and will also be visible in the contact detailed view.  
+The next frame lists all files linked to transactions. At the bottom of the page, the left frame shows statistics about the repartition of expenses and incomes among the categories, and the right frame shows said categories. The app comes with default categories (the ones shown on the screenshots), but more can be added if needed.
+![Accounting add a category](/img/using_the_app/accounting_add_category.png)
+A custom category has a name, an optional description and a color. 
