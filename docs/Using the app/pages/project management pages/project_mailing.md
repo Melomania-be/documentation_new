@@ -1,7 +1,7 @@
-# [TO BE COMPLETED] Project mailing manager
+# Project mailing manager
 ![Project participants view](/img/using_the_app/project_mailing1.png)
 ![Project participants view](/img/using_the_app/project_mailing2.png)
 This page allows the user to manage the mailings in the scope of a project. The app offers two automated mail types: recruitment emails and callsheet notifications. 
-The former is an automated mail sent to all contacts subscribed to emails to notify them of an upcoming project, containing the link to the registration form, and a link to a page used to recommend contacts. This feature is still in developement. [TO BE COMPLETED]
+The former is an automated mail sent to all contacts subscribed to emails to notify them of an upcoming project, containing the link to the registration form, and a link to a page used to recommend contacts. This feature is still in developement.  
 The second type of automatic one-push mail is the callsheet notification. This sends out an email to all participants of the project using the corresponding template (see the section about mailing), telling them the projects callsheet has been updated. This is to be used whenever an important information has been added to the callsheet (or has changed).
 The app also offers the possibility to send a custom email to everyone in the project, using a template or written on the spot. In that case, the user can either write HTML code or use the visual editor (wich also allows to insert pictures, files, maps integrations,...)
