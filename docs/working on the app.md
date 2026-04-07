@@ -70,5 +70,5 @@ Since this app is already in use, it is very important to safeguard it from new 
 ```zsh
 npm run dev
 ```
-- Development server: once the code has been tested, reviewed and merged into the `main`branch, it can be deployed to the development server (see section on workflows for precise procedure). This server mimics the production server, has a mock database and allows for functional testing. This deployment needs to be repeated until the app works perfectly.
+- Development server: once the code has been tested, reviewed and merged into the `main`branch, it can be deployed to the development server (see section on workflows for precise procedure). This server mimics the production server, has a mock database and allows for functional testing. This deployment needs to be repeated until the app works perfectly. This servers is located at http://tool.sc1ciro3903.universe.wf/, and can be logged into with the adress admin@admin.admin and password admin.
 - Production server: once the development version has been rigorously tested, and everything works well, the development version can be promoted to production, which is the actual server where the app is being used. 
