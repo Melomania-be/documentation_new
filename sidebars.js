@@ -44,6 +44,7 @@ const sidebars = {
             },
             'Using the app/pages/contacts',
             'Using the app/pages/users',
+            'Using the app/pages/mailing',
           ],
         },
       ],
