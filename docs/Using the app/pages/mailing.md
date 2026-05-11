@@ -1,5 +1,5 @@
 # Global mailing manager
-
+*Edited by Borshon*
 The global mailing page is the app-wide email hub, separate from the project-level mailing tools. It is divided into three tabs: sending an email to a contact list, managing custom templates, and configuring system templates.
 
 ## Sending an email

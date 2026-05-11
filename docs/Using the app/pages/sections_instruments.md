@@ -1,5 +1,5 @@
 # Sections and instruments pages
-
+*Edited by Ramy*
 The sections and instruments tool allows the user to organize the musical structure used throughout projects. Through this page, the user can manage instruments, create sections associated with those instruments, and organize sections into groups.
 
 ## Main sections and instruments page
