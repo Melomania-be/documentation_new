@@ -39,6 +39,7 @@ const sidebars = {
                 'Using the app/pages/project management pages/callsheet_pages',
                 'Using the app/pages/project management pages/accounting',
                 'Using the app/pages/project management pages/recruitment',
+                'Using the app/pages/project management pages/sections_instruments',
                 'Using the app/pages/project management pages/auditions',
               ],
             },
