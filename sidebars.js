@@ -48,6 +48,7 @@ const sidebars = {
       items: [
         'Technical Documentation/callsheet',
         'Technical Documentation/attendance',
+        'Technical Documentation/files',
       ],
     },
   ],
