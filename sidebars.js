@@ -39,6 +39,13 @@ const sidebars = {
         },
       ],
     },
+    {
+      type: 'category',
+      label: 'Technical Documentation',
+      items: [
+        'technical-documentation/contacts',
+      ],
+    },
     'working on the app',
     'database',
     'workflows',
