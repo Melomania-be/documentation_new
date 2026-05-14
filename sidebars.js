@@ -43,22 +43,16 @@ const sidebars = {
       type: 'category',
       label: 'Technical Documentation',
       items: [
-        'technical-documentation/contacts',
-      ],
-    },
-    'working on the app',
-    'database',
-    'workflows',
-    {
-      type: 'category',
-      label: 'Technical Documentation',
-      items: [
+        'Technical Documentation/contacts',
         'Technical Documentation/callsheet',
         'Technical Documentation/attendance',
         'Technical Documentation/files',
         'Technical Documentation/sections_instruments',
       ],
     },
+    'working on the app',
+    'database',
+    'workflows',
   ],
 };
 
