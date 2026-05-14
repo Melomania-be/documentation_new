@@ -1,4 +1,4 @@
-# Technical Documentation: Sections & Instruments Feature
+# TD - Sections & Instruments Feature
 
 *Edited by Ramy*
 

@@ -39,20 +39,20 @@ const sidebars = {
         },
       ],
     },
-    {
-      type: 'category',
-      label: 'Technical Documentation',
-      items: [
-        'Technical Documentation/contacts',
-        'Technical Documentation/callsheet',
-        'Technical Documentation/attendance',
-        'Technical Documentation/files',
-        'Technical Documentation/sections_instruments',
-      ],
-    },
     'working on the app',
     'database',
     'workflows',
+    {
+      type: 'category',
+      label: 'Technical documentation',
+      items: [
+        'Technical documentation/contacts',
+        'Technical documentation/callsheet',
+        'Technical documentation/attendance',
+        'Technical documentation/files',
+        'Technical documentation/sections_instruments',
+      ],
+    },
   ],
 };
 
