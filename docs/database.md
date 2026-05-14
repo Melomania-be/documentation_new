@@ -5,7 +5,7 @@ This page provides a detailed explanation of the database structure, their roles
 
 ## Overview
 
-The Melomania database is a **PostgreSQL** relational database. It stores all data related to musical projects, repertoire, participants, instruments, and contacts managed through the application.
+This is a relational database. It stores all data related to musical projects, repertoire, participants, instruments, and contacts managed through the application.
 
 ---
 
