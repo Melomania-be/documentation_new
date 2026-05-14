@@ -49,6 +49,7 @@ const sidebars = {
         'Technical Documentation/callsheet',
         'Technical Documentation/attendance',
         'Technical Documentation/files',
+        'Technical Documentation/sections_instruments',
       ],
     },
   ],
