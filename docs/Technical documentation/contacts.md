@@ -1,9 +1,9 @@
 ---
 id: contacts
-title: Contacts Technical Documentation
+title: TD - Contacts
 ---
 
-# Contacts Technical Documentation
+# TD - Contacts
 
 edited by TOUVOLI BALLO STEVE, 12/05/2026
 

@@ -1,4 +1,4 @@
-# TD - Files Feature
+# TD - File Manager
 
 *Edited by Naomi*
 
