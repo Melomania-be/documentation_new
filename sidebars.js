@@ -44,12 +44,13 @@ const sidebars = {
     'workflows',
     {
       type: 'category',
-      label: 'Technical Documentation',
+      label: 'Technical documentation',
       items: [
-        'Technical Documentation/callsheet',
-        'Technical Documentation/attendance',
-        'Technical Documentation/files',
-        'Technical Documentation/sections_instruments',
+        'Technical documentation/contacts',
+        'Technical documentation/callsheet',
+        'Technical documentation/attendance',
+        'Technical documentation/files',
+        'Technical documentation/sections_instruments',
       ],
     },
   ],

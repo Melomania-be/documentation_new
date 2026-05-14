@@ -1,4 +1,4 @@
-# Technical Documentation: Sections & Instruments Feature
+# TD - Sections & Instruments Feature
 
 *Edited by Ramy*
 
@@ -201,9 +201,11 @@ Defines relationships between sections and section groups.
 
 ## SectionGroup model
 
+```text
 SectionGroup
  ├── manyToMany → Section
  └── hasMany → Project
+ ```
 
 ## Feature Workflow
 
@@ -211,15 +213,15 @@ SectionGroup
 
 On page mount:
 
-all section groups are fetched
-all sections are fetched
-all instruments are fetched
+- all section groups are fetched
+- all sections are fetched
+- all instruments are fetched
 
 The frontend uses:
 
-`GET /api/sectionGroups`
-`GET /api/sections`
-`GET /api/instruments`
+- `GET /api/sectionGroups`
+- `GET /api/sections`
+- `GET /api/instruments`
 
 ## 2. Creating and Editing
 
@@ -241,15 +243,16 @@ referenced relations are valid
 
 Users can duplicate:
 
-instruments
-sections
-section groups
+- instruments
+- sections
+- section groups
 
 The duplicated entity:
 
-receives a new ID
-copies all relations
-appends (Copy) to the name
+- receives a new ID
+- copies all relations
+- appends (Copy) to the name
+
 ## 4. Deletion
 
 Deletion uses:
@@ -262,33 +265,33 @@ Cascade deletes automatically remove pivot relationships.
 
 Inside projects, the feature displays:
 
-participant counts per section
-target section sizes
+participant counts per section,
+target section sizes and 
 fill-rate percentages
 
 The fill rate is calculated using:
 
-participantCount / sectionSize
+- participantCount / sectionSize
 
-Sections can also be:
+- Sections can also be:
 
-sorted by fill rate
-viewed responsively on mobile
-expanded to show participant lists
-Section PDFs
+- sorted by fill rate
+- viewed responsively on mobile
+- expanded to show participant lists
+- Section PDFs
 
 The section_pdfs table allows projects to attach PDF files to sections.
 
-The feature supports:
+- The feature supports:
 
-score distribution
-audition files
-required documents
-usage statistics
+- score distribution
+- audition files
+- required documents
+- usage statistics
 
 ## Additional metadata includes:
 
-active state
-required state
-audition count
-ordering
+- active state
+- required state
+- audition count
+- ordering
