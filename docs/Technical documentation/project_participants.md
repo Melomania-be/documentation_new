@@ -1,4 +1,5 @@
 # TD - Project Participants
+*Edited by Steve on 15/05/2026*
 
 So, in Melomania, a **Participant** is basically the link between a real person (a **Contact**) and a specific **Project**. 
 
