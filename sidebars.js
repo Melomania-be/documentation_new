@@ -52,6 +52,7 @@ const sidebars = {
         'Technical documentation/files',
         'Technical documentation/sections_instruments',
         'Technical documentation/auditions',
+        'Technical documentation/usersmanagement',
       ],
     },
   ],
