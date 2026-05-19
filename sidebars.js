@@ -55,7 +55,9 @@ const sidebars = {
         'Technical documentation/usersmanagement',
         'Technical documentation/composers_and_pieces',
         'Technical documentation/mailing',
-        'Technical documentation/project_participants'
+        'Technical documentation/project_participants',
+        'Technical documentation/recruitment',
+        'Technical documentation/accounting',
       ],
     },
   ],
