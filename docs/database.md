@@ -1,11 +1,8 @@
-# Database structure
-This page provides a detailed explanation of the database structure, their roles, and the relationships between them.
-
----
+# Database Structure
 
 ## Overview
 
-This is a relational database. It stores all data related to musical projects, repertoire, participants, instruments, and contacts managed through the application.
+The Melomania database is a **PostgreSQL** relational database. It stores all data related to musical projects, repertoire, participants, instruments, contacts, mailing, accounting, and recruitment managed through the application.
 
 ---
 
@@ -19,38 +16,51 @@ This is a relational database. It stores all data related to musical projects, r
 │ name            │       │ first_name      │       │ name            │
 └────────┬────────┘       │ last_name       │       └────────┬────────┘
          │                └────────┬────────┘                │
-         │                         │                         │
          ▼                         ▼                         ▼
-┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
-│   Repertoire    │◄──────│   Repertoire    │       │     Plays       │
-│─────────────────│       │  (composer_id)  │       │─────────────────│
-│ id (PK)         │       └─────────────────┘       │ id (PK)         │
-│ title           │                                  │ participant_id  │
-│ type_id (FK)    │                                  │ instrument_id   │
-│ composer_id (FK)│                                  │ section_id (FK) │
-└────────┬────────┘                                  └────────┬────────┘
-         │                                                    │
+┌─────────────────┐                                 ┌─────────────────┐
+│   Repertoire    │                                 │     Plays       │
+│─────────────────│                                 │─────────────────│
+│ id (PK)         │                                 │ id (PK)         │
+│ title           │                                 │ participant_id  │
+│ type_id (FK)    │                                 │ instrument_id   │
+│ composer_id (FK)│                                 │ section_id (FK) │
+└────────┬────────┘                                 └────────┬────────┘
          │              ┌─────────────────┐                  │
          │              │    Projects     │                  │
-         │              │─────────────────│                  │
-         └─────────────►│ id (PK)         │◄─────────────────┘
-                        │ name            │
-                        │ description     │         ┌─────────────────┐
-                        │ date            │         │    Sections     │
-                        └────────┬────────┘         │─────────────────│
-                                 │                  │ id (PK)         │
+         └─────────────►│─────────────────│◄─────────────────┘
+                        │ id (PK)         │
+                        │ name            │         ┌─────────────────┐
+                        │ description     │         │    Sections     │
+                        │ date            │         │─────────────────│
+                        └────────┬────────┘         │ id (PK)         │
                                  │                  │ name            │
                                  ▼                  └─────────────────┘
                         ┌─────────────────┐
-                        │   Participant   │◄──────┐
-                        │─────────────────│       │
-                        │ id (PK)         │       │  ┌─────────────────┐
-                        │ first_name      │       │  │    Contacts     │
-                        │ last_name       │       │  │─────────────────│
-                        │ project_id (FK) │       └──│ participant_id  │
-                        └─────────────────┘          │ email           │
-                                                     │ phone           │
-                                                     └─────────────────┘
+                        │   Participant   │
+                        │─────────────────│
+                        │ id (PK)         │──────────────────────────┐
+                        │ contact_id (FK) │──────┐                   │
+                        │ project_id (FK) │      │                   │
+                        └─────────────────┘      ▼                   ▼
+                                          ┌──────────────┐  ┌─────────────────┐
+                                          │   Contacts   │  │   Recruitment   │
+                                          │──────────────│  │─────────────────│
+                                          │ id (PK)      │  │ id (PK)         │
+                                          │ email        │  │ participant_id  │
+                                          │ phone        │  │ status          │
+                                          └──────────────┘  │ applied_at      │
+                                                            └─────────────────┘
+
+┌─────────────────────┐       ┌─────────────────────┐
+│       Mailing       │       │      Accounting     │
+│─────────────────────│       │─────────────────────│
+│ id (PK)             │       │ id (PK)             │
+│ subject             │       │ participant_id (FK) │
+│ body                │       │ amount              │
+│ sent_at             │       │ type                │
+│ recipient_count     │       │ date                │
+└─────────────────────┘       │ description         │
+                              └─────────────────────┘
 ```
 
 ---
@@ -139,11 +149,14 @@ Stores the people (musicians) participating in a project.
 | id         | int PK | Unique identifier              |
 | first_name | string | Participant first name         |
 | last_name  | string | Participant last name          |
+| contact_id | int FK | References `Contacts.id`       |
 | project_id | int FK | References `Projects.id`       |
+
+> ⚠️ **Design note:** `Participant` references `Contacts` via a `contact_id` foreign key rather than storing contact details directly. This avoids data duplication and ensures that if a contact's email or phone changes, it only needs to be updated in one place. Storing the data in hard in `Participant` would create redundancy and a risk of inconsistency between tables.
 
 **Relations:**
 - belongs to one `Project`
-- has one `Contacts` entry
+- belongs to one `Contacts` entry
 - can play many instruments via `Plays`
 
 ---
@@ -166,14 +179,61 @@ Junction table that links a participant to the instrument(s) they play and the s
 ---
 
 ### `Contacts`
-Stores the contact information for each participant.
+Stores the contact information (email, phone) independently from participants. A participant references a contact via `contact_id`, which avoids storing contact details in hard in multiple places.
 
-| Column         | Type   | Description                    |
-|----------------|--------|--------------------------------|
-| id             | int PK | Unique identifier              |
-| participant_id | int FK | References `Participant.id`    |
-| email          | string | Email address                  |
-| phone          | string | Phone number                   |
+| Column | Type   | Description       |
+|--------|--------|-------------------|
+| id     | int PK | Unique identifier |
+| email  | string | Email address     |
+| phone  | string | Phone number      |
+
+**Relations:**
+- referenced by `Participant` via `contact_id`
+
+---
+
+### `Mailing`
+Stores the mailing campaigns sent to participants or groups of participants.
+
+| Column           | Type     | Description                        |
+|------------------|----------|------------------------------------|
+| id               | int PK   | Unique identifier                  |
+| subject          | string   | Subject of the email               |
+| body             | text     | Content of the email               |
+| sent_at          | datetime | Date and time the email was sent   |
+| recipient_count  | int      | Number of recipients               |
+
+**Relations:**
+- can target many `Participants`
+
+---
+
+### `Accounting`
+Stores financial transactions related to participants or projects (membership fees, payments, reimbursements, etc.).
+
+| Column         | Type   | Description                          |
+|----------------|--------|--------------------------------------|
+| id             | int PK | Unique identifier                    |
+| participant_id | int FK | References `Participant.id`          |
+| amount         | float  | Amount of the transaction            |
+| type           | string | Type of transaction (income/expense) |
+| date           | date   | Date of the transaction              |
+| description    | text   | Description of the transaction       |
+
+**Relations:**
+- belongs to one `Participant`
+
+---
+
+### `Recruitment`
+Stores recruitment requests or applications from people wishing to join a project or the orchestra.
+
+| Column         | Type     | Description                            |
+|----------------|----------|----------------------------------------|
+| id             | int PK   | Unique identifier                      |
+| participant_id | int FK   | References `Participant.id`            |
+| status         | string   | Status of the application (pending, accepted, rejected) |
+| applied_at     | datetime | Date of the application                |
 
 **Relations:**
 - belongs to one `Participant`
@@ -188,7 +248,21 @@ Stores the contact information for each participant.
 | Repertoire   | belongs to     | Composer       | Many-to-One  |
 | Repertoire   | linked to      | Projects       | Many-to-Many |
 | Participant  | belongs to     | Projects       | Many-to-One  |
-| Participant  | has one        | Contacts       | One-to-One   |
+| Participant  | references     | Contacts       | Many-to-One  |
 | Plays        | links          | Participant    | Many-to-One  |
 | Plays        | links          | Instrument     | Many-to-One  |
 | Plays        | links          | Sections       | Many-to-One  |
+| Accounting   | belongs to     | Participant    | Many-to-One  |
+| Recruitment  | belongs to     | Participant    | Many-to-One  |
+| Mailing      | targets        | Participant    | Many-to-Many |
+
+---
+
+## Notes
+
+> ⚠️ The database schema is managed via **AdonisJS Lucid** migrations located in the `back` repository under `database/migrations/`. Always run migrations after pulling new changes:
+> ```bash
+> node ace migration:run
+> ```
+
+> ℹ️ A legacy migration script written in Python is available in the `database` repository under `migrationScript/`. It was used to migrate data from the old Melomania database and is kept for historical reference only.
