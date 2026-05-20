@@ -2,8 +2,72 @@
 
 ## Overview
 
-The Melomania database is a **PostgreSQL** relational database. It stores all data related to musical projects, repertoire, participants, instruments, contacts, mailing, accounting, and recruitment managed through the application.
+The database is a **PostgreSQL** relational database. It stores all data related to musical projects, repertoire, participants, instruments, contacts, mailing, accounting, and recruitment managed through the application.
 
+## Schema diagram
+
+```
+┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
+│   TypeOfPiece   │       │    Composer     │       │   Instrument    │
+│─────────────────│       │─────────────────│       │─────────────────│
+│ id (PK)         │       │ id (PK)         │       │ id (PK)         │
+│ name            │       │ first_name      │       │ name            │
+└────────┬────────┘       │ last_name       │       └────────┬────────┘
+         │                └────────┬────────┘                │
+         │                         │                         │
+         ▼                         ▼                         ▼
+┌─────────────────────────────────────────┐       ┌─────────────────┐
+│              Repertoire                 │       │     Plays       │
+│─────────────────────────────────────────│       │─────────────────│
+│ id (PK)                                 │       │ id (PK)         │
+│ title                                   │       │ participant_id  │
+│ type_id (FK) → TypeOfPiece              │       │ instrument_id   │
+│ composer_id (FK) → Composer             │       │ section_id (FK) │
+└────────────────────┬────────────────────┘       └────────┬────────┘
+                     │                                     │
+                     │         ┌─────────────────┐         │
+                     │         │    Projects     │         │
+                     └────────►│─────────────────│◄────────┘
+                               │ id (PK)         │
+                               │ name            │    ┌─────────────────┐
+                               │ description     │    │    Sections     │
+                               │ date            │    │─────────────────│
+                               └────────┬────────┘    │ id (PK)         │
+                                        │             │ name            │
+                                        ▼             └─────────────────┘
+                               ┌─────────────────┐
+                               │   Participant   │
+                               │─────────────────│
+                               │ id (PK)         │──────────────┐
+                               │ first_name      │              │
+                               │ last_name       │              ▼
+                               │ contact_id (FK) │─────► ┌─────────────────┐
+                               │ project_id (FK) │       │    Contacts     │
+                               └────────┬────────┘       │─────────────────│
+                                        │                │ id (PK)         │
+                               ┌────────┴────────┐       │ email           │
+                               ▼                 ▼       │ phone           │
+                     ┌──────────────┐  ┌──────────────┐  └─────────────────┘
+                     │  Accounting  │  │ Recruitment  │
+                     │──────────────│  │──────────────│
+                     │ id (PK)      │  │ id (PK)      │
+                     │ part_id (FK) │  │ part_id (FK) │
+                     │ amount       │  │ status       │
+                     │ type         │  │ applied_at   │
+                     │ date         │  └──────────────┘
+                     │ description  │
+                     └──────────────┘
+
+┌─────────────────────┐
+│       Mailing       │
+│─────────────────────│
+│ id (PK)             │
+│ subject             │
+│ body                │
+│ sent_at             │
+│ recipient_count     │
+└─────────────────────┘
+```
 
 ## Tables
 
