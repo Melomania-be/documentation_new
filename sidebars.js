@@ -50,6 +50,7 @@ const sidebars = {
         'Technical documentation/callsheet',
         'Technical documentation/attendance',
         'Technical documentation/files',
+        'Technical documentation/participants',
         'Technical documentation/sections_instruments',
         'Technical documentation/auditions',
         'Technical documentation/usersmanagement',
