@@ -13,10 +13,11 @@ Each project has its own recruitment list. Contacts are not shared between proje
 
 1. The project manager adds candidates to the list (manually, from the global Contacts database, or by copying from another project).
 2. Each contact has a status. By default it is `Not yet contacted`.
-3. When the project manager contacts the candidate, the status changes to `Awaiting response` and the contact date is saved.
-4. If the candidate does not reply after a delay (7 days by default), the status changes automatically to `Follow up`.
-5. After the candidate replies, the status moves to `Pending validation`, then to `Recruited`, `Not available`, or `Cancelled`.
-Recommendations sent through the public recommendation link of the project appear in a separate tab.
+3. The project manager manually updates the status as the recruitment progresses (for example to `Awaiting response` after contacting, `Recruited` after the person accepts, etc.). Each manual change also updates the contact date.
+4. There are only two cases where the status changes automatically:
+    - When a contact stays in `Awaiting response` for too long (delay defined in Settings), it is moved to `Follow up`.
+    - When a person registers and the app finds them in the recruitment list, their status is updated automatically.
+5. Recommendations sent through the public recommendation link of the project appear in a separate tab.
 
 ## The Recruitment Management page
 
