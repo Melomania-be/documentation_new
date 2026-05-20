@@ -30,7 +30,7 @@ The database is a **PostgreSQL** relational database. It stores all data related
                      └────────►│─────────────────│◄────────┘
                                │ id (PK)         │
                                │ name            │    ┌─────────────────┐
-                               │ description     │    │    Sections     │
+                               │ description     │◄── │    Sections     │
                                │ date            │    │─────────────────│
                                └────────┬────────┘    │ id (PK)         │
                                         │             │ name            │
@@ -40,16 +40,16 @@ The database is a **PostgreSQL** relational database. It stores all data related
                                │─────────────────│
                                │ id (PK)         │──────────────┐
                                │ first_name      │              │
-                               │ last_name       │              ▼
-                               │ contact_id (FK) │─────► ┌─────────────────┐
-                               │ project_id (FK) │       │    Contacts     │
-                               └────────┬────────┘       │─────────────────│
-                                        │                │ id (PK)         │
-                               ┌────────┴────────┐       │ email           │
-                               ▼                 ▼       │ phone           │
-                     ┌──────────────┐  ┌──────────────┐  └─────────────────┘
-                     │  Accounting  │  │ Recruitment  │
-                     │──────────────│  │──────────────│
+                               │ last_name       │              ▼                     
+                               │ contact_id (FK) │─────► ┌─────────────────┐                  ┌─────────────────────┐
+                               │ project_id (FK) │       │    Contacts     │                  │       Mailing       │
+                               └────────┬────────┘       │─────────────────│                  │─────────────────────│
+                                        │                │ id (PK)         │ ◄────────        │ id (PK)             │
+                               ┌────────┴────────┐       │ email           │                  │ subject             │
+                               ▼                 ▼       │ phone           │                  │ body                │
+                     ┌──────────────┐  ┌──────────────┐  └─────────────────┘                  │ sent_at             │
+                     │  Accounting  │  │ Recruitment  │                                       │ recipient_count     │
+                     │──────────────│  │──────────────│                                       └─────────────────────┘
                      │ id (PK)      │  │ id (PK)      │
                      │ part_id (FK) │  │ part_id (FK) │
                      │ amount       │  │ status       │
@@ -58,15 +58,6 @@ The database is a **PostgreSQL** relational database. It stores all data related
                      │ description  │
                      └──────────────┘
 
-┌─────────────────────┐
-│       Mailing       │
-│─────────────────────│
-│ id (PK)             │
-│ subject             │
-│ body                │
-│ sent_at             │
-│ recipient_count     │
-└─────────────────────┘
 ```
 
 ## Tables
