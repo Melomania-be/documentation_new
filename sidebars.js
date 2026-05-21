@@ -59,6 +59,7 @@ const sidebars = {
         'Technical documentation/project_participants',
         'Technical documentation/recruitment',
         'Technical documentation/accounting',
+        'Technical documentation/dashboard',
       ],
     },
   ],
