@@ -22,21 +22,21 @@ The database is a **PostgreSQL** relational database. It stores all data related
 │ id (PK)                                 │       │ id (PK)         │
 │ title                                   │       │ participant_id  │
 │ type_id (FK) → TypeOfPiece              │       │ instrument_id   │
-│ composer_id (FK) → Composer             │       │ section_id (FK) │
+│ composer_id (FK) → Composer             │       │ program_id (FK) │
 └────────────────────┬────────────────────┘       └────────┬────────┘
                      │                                     │
                      │         ┌─────────────────┐         │
-                     │         │    Concert     │         │
+                     │         │    Concert      │         │
                      └────────►│─────────────────│◄────────┘
-                               │ id (PK)         │
+                               │ id_concert(PK)  │
                                │ name            │    ┌─────────────────┐
-                               │ description     │◄── │    Sections     │
+                               │ description     │◄── │    Progam       │
                                │ date            │    │─────────────────│
                                └────────┬────────┘    │ id (PK)         │
                                         │             │ name            │
-                                        ▼             └─────────────────┘
-                               ┌─────────────────┐
-                               │   Participant   │
+                                        ▼             | place           |
+                               ┌─────────────────┐    |id_concert (FK)  |
+                               │   Participant   │    └─────────────────┘
                                │─────────────────│
                                │ id (PK)         │──────────────┐
                                │ first_name      │              │
@@ -241,8 +241,8 @@ Stores recruitment requests or applications from people wishing to join a projec
 |--------------|----------------|----------------|--------------|
 | Repertoire   | belongs to     | TypeOfPiece    | Many-to-One  |
 | Repertoire   | belongs to     | Composer       | Many-to-One  |
-| Repertoire   | linked to      | Projects       | Many-to-Many |
-| Participant  | belongs to     | Projects       | Many-to-One  |
+| Repertoire   | linked to      | Conert         | Many-to-Many |
+| Participant  | belongs to     | Concert        | Many-to-One  |
 | Participant  | references     | Contacts       | Many-to-One  |
 | Plays        | links          | Participant    | Many-to-One  |
 | Plays        | links          | Instrument     | Many-to-One  |
