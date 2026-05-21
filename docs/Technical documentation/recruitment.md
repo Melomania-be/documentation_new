@@ -57,6 +57,15 @@ Opens a form to create a contact directly. The fields are:
 - **Contacted by** (auto-filled with the connected user, can be modified)
 - **Notes** (free text)
 
+While entering a contact manually, the application automatically searches existing contacts in the database to detect possible duplicates or similar contacts.
+
+The detection works on:
+- First name and last name (including approximate/similar matches)
+- Email address
+- Phone number (normalized to support different formats)
+
+When a possible match is found, the application suggests the existing contact and allows reusing its information instead of creating a duplicate entry.
+
 When saved, the contact is created with the status `Not yet contacted` and the source `Manual`.
 
 ### Import Contacts
@@ -87,7 +96,11 @@ In the code, the statuses are defined as a TypeScript union type in `recruitment
 
 ### Custom statuses
 
-In addition to the 7 default statuses, the project manager can create custom statuses by clicking the **+ Statuses** button on the Recruitment page. A popup opens with a field to enter the name of a new custom status.
+In addition to the 7 default statuses, the project manager can create custom statuses by clicking the **+ Statuses** button on the Recruitment page.
+
+A popup opens with a field to enter the name of a new custom status. Once created, the custom status becomes available in the status dropdown of all recruitment contacts in the project.
+
+Custom statuses are persisted in the database and remain available after refreshing the page.
 
 The list of default statuses is shown for reference inside the popup to avoid duplicates.
 

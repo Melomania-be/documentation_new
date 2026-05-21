@@ -3,6 +3,23 @@
 ## Overview
 
 The database is a **PostgreSQL** relational database. It stores all data related to musical projects, repertoire, participants, instruments, contacts, mailing, accounting, and recruitment managed through the application.
+<iframe width="800" height="500" src='https://dbdiagram.io/e/6a0c1da89f1f8ec47b4d081c/6a0c1dae697f99c167ad3e22'> </iframe>
+To edit this schema, go to https://dbdiagram.io/d and sign in using the dummy email account melomaniadevmail@gmail.com. The sign-in requires to give an OTP sent to the email adress, so you need to log into the dummy account on gmail (pw: melomania_devMail1) to retrieve it. 
+To this day, the contents of this schema is based on the following dump from 19/5/2026:
+<a href="/files/dump_19-5-2026.sql" download="dump_19-5-2026.sql" style={{
+  display: 'inline-block',
+  backgroundColor: '#2563eb',
+  color: 'white',
+  padding: '10px 20px',
+  borderRadius: '6px',
+  fontWeight: 'bold',
+  textDecoration: 'none',
+  marginTop: '5px'
+}}>
+  Download dump (.sql)
+</a>
+
+Le lien vers le schéma interactif est : https://dbdiagram.io/d/Schema-diagram-6a0c7d94697f99c167b3a5f3 
 
 ## Schema diagram
 
@@ -22,21 +39,21 @@ The database is a **PostgreSQL** relational database. It stores all data related
 │ id (PK)                                 │       │ id (PK)         │
 │ title                                   │       │ participant_id  │
 │ type_id (FK) → TypeOfPiece              │       │ instrument_id   │
-│ composer_id (FK) → Composer             │       │ section_id (FK) │
+│ composer_id (FK) → Composer             │       │ program_id (FK) │
 └────────────────────┬────────────────────┘       └────────┬────────┘
                      │                                     │
                      │         ┌─────────────────┐         │
-                     │         │    Projects     │         │
+                     │         │    Concert      │         │
                      └────────►│─────────────────│◄────────┘
-                               │ id (PK)         │
+                               │ id_concert(PK)  │
                                │ name            │    ┌─────────────────┐
-                               │ description     │◄── │    Sections     │
+                               │ description     │◄── │    Progam       │
                                │ date            │    │─────────────────│
                                └────────┬────────┘    │ id (PK)         │
                                         │             │ name            │
-                                        ▼             └─────────────────┘
-                               ┌─────────────────┐
-                               │   Participant   │
+                                        ▼             | place           |
+                               ┌─────────────────┐    |id_concert (FK)  |
+                               │   Participant   │    └─────────────────┘
                                │─────────────────│
                                │ id (PK)         │──────────────┐
                                │ first_name      │              │
@@ -100,7 +117,7 @@ Stores all the musical pieces in the application's repertoire. Each piece is lin
 
 ---
 
-### `Projects`
+### `Concerts`
 Stores the musical projects managed in the application (concerts, rehearsals, events, etc.).
 
 | Column      | Type   | Description                       |
@@ -241,8 +258,8 @@ Stores recruitment requests or applications from people wishing to join a projec
 |--------------|----------------|----------------|--------------|
 | Repertoire   | belongs to     | TypeOfPiece    | Many-to-One  |
 | Repertoire   | belongs to     | Composer       | Many-to-One  |
-| Repertoire   | linked to      | Projects       | Many-to-Many |
-| Participant  | belongs to     | Projects       | Many-to-One  |
+| Repertoire   | linked to      | Conert         | Many-to-Many |
+| Participant  | belongs to     | Concert        | Many-to-One  |
 | Participant  | references     | Contacts       | Many-to-One  |
 | Plays        | links          | Participant    | Many-to-One  |
 | Plays        | links          | Instrument     | Many-to-One  |
@@ -251,3 +268,13 @@ Stores recruitment requests or applications from people wishing to join a projec
 | Recruitment  | belongs to     | Participant    | Many-to-One  |
 | Mailing      | targets        | Participant    | Many-to-Many |
 
+
+
+## Notes
+
+> ⚠️ The database schema is managed via **AdonisJS Lucid** migrations located in the `back` repository under `database/migrations/`. Always run migrations after pulling new changes:
+> ```bash
+> node ace migration:run
+> ```
+
+> ℹ️ A legacy migration script written in Python is available in the `database` repository under `migrationScript/`. It was used to migrate data from the old Melomania database and is kept for historical reference only.
