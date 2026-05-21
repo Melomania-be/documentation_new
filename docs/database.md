@@ -18,7 +18,6 @@ To this day, the contents of this schema is based on the following dump from 19/
 }}>
   Download dump (.sql)
 </a>
-```
 
 Le lien vers le schéma interactif est : https://dbdiagram.io/d/Schema-diagram-6a0c7d94697f99c167b3a5f3 
 
