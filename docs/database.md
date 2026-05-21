@@ -251,3 +251,13 @@ Stores recruitment requests or applications from people wishing to join a projec
 | Recruitment  | belongs to     | Participant    | Many-to-One  |
 | Mailing      | targets        | Participant    | Many-to-Many |
 
+
+
+## Notes
+
+> ⚠️ The database schema is managed via **AdonisJS Lucid** migrations located in the `back` repository under `database/migrations/`. Always run migrations after pulling new changes:
+> ```bash
+> node ace migration:run
+> ```
+
+> ℹ️ A legacy migration script written in Python is available in the `database` repository under `migrationScript/`. It was used to migrate data from the old Melomania database and is kept for historical reference only.
