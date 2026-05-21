@@ -26,7 +26,7 @@ The database is a **PostgreSQL** relational database. It stores all data related
 └────────────────────┬────────────────────┘       └────────┬────────┘
                      │                                     │
                      │         ┌─────────────────┐         │
-                     │         │    Projects     │         │
+                     │         │    Concert     │         │
                      └────────►│─────────────────│◄────────┘
                                │ id (PK)         │
                                │ name            │    ┌─────────────────┐
@@ -100,7 +100,7 @@ Stores all the musical pieces in the application's repertoire. Each piece is lin
 
 ---
 
-### `Projects`
+### `Concerts`
 Stores the musical projects managed in the application (concerts, rehearsals, events, etc.).
 
 | Column      | Type   | Description                       |
