@@ -3,6 +3,22 @@
 ## Overview
 
 The database is a **PostgreSQL** relational database. It stores all data related to musical projects, repertoire, participants, instruments, contacts, mailing, accounting, and recruitment managed through the application.
+<iframe width="800" height="500" src='https://dbdiagram.io/e/6a0c1da89f1f8ec47b4d081c/6a0c1dae697f99c167ad3e22'> </iframe>
+To edit this schema, go to https://dbdiagram.io/d and sign in using the dummy email account melomaniadevmail@gmail.com. The sign-in requires to give an OTP sent to the email adress, so you need to log into the dummy account on gmail (pw: melomania_devMail1) to retrieve it. 
+To this day, the contents of this schema is based on the following dump from 19/5/2026:
+<a href="/files/dump_19-5-2026.sql" download="dump_19-5-2026.sql" style={{
+  display: 'inline-block',
+  backgroundColor: '#2563eb',
+  color: 'white',
+  padding: '10px 20px',
+  borderRadius: '6px',
+  fontWeight: 'bold',
+  textDecoration: 'none',
+  marginTop: '5px'
+}}>
+  Download dump (.sql)
+</a>
+```
 
 Le lien vers le schéma interactif est : https://dbdiagram.io/d/Schema-diagram-6a0c7d94697f99c167b3a5f3 
 
