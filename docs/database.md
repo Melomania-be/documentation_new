@@ -2,712 +2,1253 @@
 
 ## Overview
 
-The database is a **PostgreSQL** relational database. It stores all data related to musical projects, repertoire, participants, instruments, contacts, mailing, accounting, and recruitment managed through the application.
-<iframe width="800" height="500" src='https://dbdiagram.io/e/6a0c1da89f1f8ec47b4d081c/6a0c1dae697f99c167ad3e22'> </iframe>
-To edit this schema, go to https://dbdiagram.io/d and sign in using the dummy email account melomaniadevmail@gmail.com. The sign-in requires to give an OTP sent to the email adress, so you need to log into the dummy account on gmail (pw: melomania_devMail1) to retrieve it. 
-To this day, the contents of this schema is based on the following dump from 19/5/2026:
-<a href="/files/dump_19-5-2026.sql" download="dump_19-5-2026.sql" style={{
-  display: 'inline-block',
-  backgroundColor: '#2563eb',
-  color: 'white',
-  padding: '10px 20px',
-  borderRadius: '6px',
-  fontWeight: 'bold',
-  textDecoration: 'none',
-  marginTop: '5px'
-}}>
-  Download dump (.sql)
-</a>
+PostgreSQL relational database storing all Melomania data: projects, repertoire, participants, instruments, contacts, mailing, accounting, auditions, recruitment.
 
-Le lien vers le schéma interactif est : https://dbdiagram.io/d/Schema-diagram-6a0c7d94697f99c167b3a5f3 
+### Schema Access
 
-## Schema diagram
+- **Interactive schema:** https://dbdiagram.io/d/database_diagram-6a0c1da89f1f8ec47b4d081c
+- **Edit access:** https://dbdiagram.io/d (sign in with `melomaniadevmail@gmail.com`, OTP sent to email, password: `melomania_devMail1`)
+- **Embed:** `https://dbdiagram.io/e/6a0c1da89f1f8ec47b4d081c/6a0c1dae697f99c167ad3e22`
 
+Based on database dump from May 19, 2026 (`dump_19-5-2026.sql`).
+
+### Schema Management
+
+Schema managed via AdonisJS Lucid migrations in `back/database/migrations/`.
+
+Run migrations after pulling:
+```bash
+node ace migration:run
 ```
-┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
-│   TypeOfPiece   │       │    Composer     │       │   Instrument    │
-│─────────────────│       │─────────────────│       │─────────────────│
-│ id (PK)         │       │ id (PK)         │       │ id (PK)         │
-│ name            │       │ first_name      │       │ name            │
-└────────┬────────┘       │ last_name       │       └────────┬────────┘
-         │                └────────┬────────┘                │
-         │                         │                         │
-         ▼                         ▼                         ▼
-┌─────────────────────────────────────────┐       ┌─────────────────┐
-│              Repertoire                 │       │     Plays       │
-│─────────────────────────────────────────│       │─────────────────│
-│ id (PK)                                 │       │ id (PK)         │
-│ title                                   │       │ participant_id  │
-│ type_id (FK) → TypeOfPiece              │       │ instrument_id   │
-│ composer_id (FK) → Composer             │       │ program_id (FK) │
-└────────────────────┬────────────────────┘       └────────┬────────┘
-                     │                                     │
-                     │         ┌─────────────────┐         │
-                     │         │    Concert      │         │
-                     └────────►│─────────────────│◄────────┘
-                               │ id_concert(PK)  │
-                               │ name            │    ┌─────────────────┐
-                               │ description     │◄── │    Progam       │
-                               │ date            │    │─────────────────│
-                               └────────┬────────┘    │ id (PK)         │
-                                        │             │ name            │
-                                        ▼             | place           |
-                               ┌─────────────────┐    |id_concert (FK)  |
-                               │   Participant   │    └─────────────────┘
-                               │─────────────────│
-                               │ id (PK)         │──────────────┐
-                               │ first_name      │              │
-                               │ last_name       │              ▼                     
-                               │ contact_id (FK) │─────► ┌─────────────────┐                  ┌─────────────────────┐
-                               │ project_id (FK) │       │    Contacts     │                  │       Mailing       │
-                               └────────┬────────┘       │─────────────────│                  │─────────────────────│
-                                        │                │ id (PK)         │ ◄────────        │ id (PK)             │
-                               ┌────────┴────────┐       │ email           │                  │ subject             │
-                               ▼                 ▼       │ phone           │                  │ body                │
-                     ┌──────────────┐  ┌──────────────┐  └─────────────────┘                  │ sent_at             │
-                     │  Accounting  │  │ Recruitment  │                                       │ recipient_count     │
-                     │──────────────│  │──────────────│                                       └─────────────────────┘
-                     │ id (PK)      │  │ id (PK)      │
-                     │ part_id (FK) │  │ part_id (FK) │
-                     │ amount       │  │ status       │
-                     │ type         │  │ applied_at   │
-                     │ date         │  └──────────────┘
-                     │ description  │
-                     └──────────────┘
 
-```
+---
 
 ## Tables
 
-# Database Tables
-*Edited by Michelle*
+### `accounting_categories`
+
+Stores accounting categories for expenses and income (e.g. "Venue rental", "Musician fees", "Ticket sales").
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `name` | varchar(255) | Category name (required) |
+| `description` | text | Optional description |
+| `is_default` | boolean | Pre-created default category (default: false) |
+| `color` | varchar(50) | Color code for UI |
+| `icon` | varchar(50) | Icon identifier for UI |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
+
+**Relations:**
+- Referenced by `accounting_entries.category_id`
+
+**Notes:**
+- Global to application (no `project_id`)
+- New accounting system; see `expense_categories` (legacy)
+
+---
+
+### `accounting_entries`
+
+Individual accounting transactions: invoices, payments, reimbursements, income.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `project_id` | integer (FK) | References `projects.id` (nullable) |
+| `contact_id` | integer (FK) | References `contacts.id` (nullable) |
+| `category_id` | integer (FK) | References `accounting_categories.id` (nullable) |
+| `name` | varchar(255) | Transaction name (required) |
+| `description` | text | Detailed description |
+| `amount` | numeric(12,2) | Transaction amount (required, always positive) |
+| `entry_type` | text | `expense` or `income` (default: `expense`) |
+| `payment_status` | text | `pending`, `paid`, `overdue`, `cancelled` (default: `pending`) |
+| `bill_date` | date | Invoice/bill date |
+| `payment_date` | date | Actual payment date |
+| `due_date` | date | Payment deadline |
+| `attachment` | varchar(255) | File path for attached document |
+| `is_individual_payment` | boolean | Payment to individual (default: false) |
+| `is_musician_fee` | boolean | Musician payment (default: false) |
+| `invoice_number` | varchar(255) | External invoice reference |
+| `notes` | text | Internal notes |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
+
+**Relations:**
+- Belongs to `projects` (optional)
+- Belongs to `contacts` (optional, for individual payments)
+- Belongs to `accounting_categories` (optional)
+
+**Notes:**
+- Amount stored unsigned; `entry_type` determines expense vs income
+- `is_musician_fee` and `is_individual_payment` used for UI filtering
+
+---
+
+### `accounting_settings`
+
+Project-specific accounting configuration (currency, payment terms, tax).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `project_id` | integer (FK) | References `projects.id` (unique constraint) |
+| `currency` | varchar(10) | Currency code (default: `EUR`) |
+| `auto_overdue_enabled` | boolean | Auto-mark overdue entries (default: true) |
+| `default_payment_terms` | integer | Default payment delay in days (default: 30) |
+| `tax_rate` | numeric(5,2) | Tax percentage (default: 20.00) |
+| `enable_tax` | boolean | Tax enabled (default: false) |
+| `fiscal_year_start` | timestamp | Start of fiscal year |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
+
+**Relations:**
+- Belongs to `projects` (one per project)
+
+**Notes:**
+- `project_id` unique constraint (one settings record per project)
+- Not fully exposed in UI yet, backend routes exist
+
+---
+
+### `adonis_schema`
+
+Internal AdonisJS table tracking migration history.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `name` | varchar(255) | Migration file name |
+| `batch` | integer | Batch number for rollback |
+| `migration_time` | timestamp | When migration executed (default: now) |
+
+**Notes:**
+- Do not modify manually (managed by `node ace migration:run`)
+- Not part of Melomania business logic
+
+---
+
+### `adonis_schema_versions`
+
+Internal AdonisJS table tracking migration system version.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `version` | integer (PK) | Schema version number |
+
+**Notes:**
+- Do not modify manually (managed by AdonisJS Lucid)
+- Not part of Melomania business logic
+
+---
+
+### `answers`
+
+Participant responses to registration form questions.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `text` | text | Answer text (default: empty) |
+| `form_id` | integer (FK) | References `forms.id` (question) |
+| `participant_id` | integer (FK) | References `participants.id` (who answered) |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
+
+**Relations:**
+- Belongs to `forms` (question)
+- Belongs to `participants` (who answered)
+
+**Notes:**
+- Used in registration workflow when participants fill custom forms
+
+---
+
+### `attached_to_callsheets`
+
+Pivot table linking files to callsheets.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `file_id` | integer (FK, part of PK) | References `callsheets.id` (bug) |
+| `callsheet_id` | integer (FK, part of PK) | References `files.id` (bug) |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
+
+**Primary Key:** Composite (`file_id`, `callsheet_id`)
+
+**Relations:**
+- Foreign keys inverted (known migration bug):
+  - `file_id` should reference `files.id`
+  - `callsheet_id` should reference `callsheets.id`
+
+**Notes:**
+- Currently unused in UI
+- FK inversion is historical bug
+
+---
+
+### `attached_to_mail_templates`
+
+Pivot table linking files to mail templates.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `file_id` | integer (FK, part of PK) | References `files.id` |
+| `mail_template_id` | integer (FK, part of PK) | References `mail_templates.id` |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
+
+**Primary Key:** Composite (`file_id`, `mail_template_id`)
+
+**Relations:**
+- Links `files` to `mail_templates`
+
+---
+
+### `audition_files`
+
+Audio/video files uploaded by audition candidates.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `audition_id` | integer (FK) | References `auditions.id` (required) |
+| `file_id` | integer (FK) | References `files.id` (required) |
+| `file_type` | text | `audio` or `video` (required) |
+| `description` | varchar(500) | Optional description |
+| `file_size` | bigint | File size in bytes |
+| `duration_seconds` | integer | Media duration |
+| `uploaded_at` | timestamp | Upload timestamp (required) |
+| `created_at` | timestamp | Record creation (required) |
+| `updated_at` | timestamp | Last update (required) |
+
+**Constraints:**
+- `file_type` CHECK: must be `video` or `audio`
+
+**Relations:**
+- Belongs to `auditions`
+- References `files` for storage
+
+**Notes:**
+- Separate from generic `files` for audition-specific metadata (duration, upload time)
+
+---
+
+### `audition_pdf_files`
+
+PDF materials provided to audition candidates (scores, excerpts), organized by section.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `audition_id` | integer (FK) | References `auditions.id` (required) |
+| `file_id` | integer (FK) | References `files.id` (required) |
+| `section_id` | integer (FK) | References `sections.id` (required) |
+| `title` | varchar(255) | PDF title (required) |
+| `description` | text | Optional description |
+| `order` | integer | Display order (required, default: 0) |
+| `downloaded_by_candidate` | boolean | Candidate downloaded (default: false) |
+| `first_downloaded_at` | timestamp | First download timestamp |
+| `download_count` | integer | Download count (default: 0) |
+| `created_at` | timestamp | Record creation (required) |
+| `updated_at` | timestamp | Last update (required) |
+
+**Relations:**
+- Belongs to `auditions`
+- References `files` for PDF storage
+- Belongs to `sections`
+
+**Notes:**
+- Direction: admin to candidate (materials to prepare)
+- Different from `audition_files` (candidate to admin, submitted recordings)
+
+---
+
+### `auditions`
+
+Audition requests sent to candidates for projects.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `participant_id` | integer (FK) | References `participants.id` (required) |
+| `project_id` | integer (FK) | References `projects.id` (required) |
+| `secure_token` | varchar(512) | Unique secure URL token (required, unique) |
+| `instructions` | text | Instructions for candidate |
+| `required_files` | json | JSON defining required file types |
+| `deadline` | timestamp | Submission deadline |
+| `is_submitted` | boolean | Candidate submitted (required, default: false) |
+| `submitted_at` | timestamp | Submission timestamp |
+| `candidate_notes` | text | Notes from candidate |
+| `created_at` | timestamp | Record creation (required) |
+| `updated_at` | timestamp | Last update (required) |
+
+**Unique Constraint:** (`participant_id`, `project_id`) - one audition per candidate per project
+
+**Relations:**
+- Belongs to `participants` (candidate)
+- Belongs to `projects`
+- Has many `audition_files` (submitted recordings)
+- Has many `audition_pdf_files` (provided materials)
+
+**Notes:**
+- `secure_token` enables public access without login
+- Workflow: created, candidate uploads, marks submitted
+
+---
+
+### `auth_access_tokens`
+
+API authentication tokens for admin users.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `tokenable_id` | integer (FK) | References `users.id` (required) |
+| `type` | varchar(255) | Token type (required) |
+| `name` | varchar(255) | Token name/label |
+| `hash` | varchar(255) | Hashed token (required) |
+| `abilities` | text | JSON permissions (required) |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
+| `last_used_at` | timestamp | Last use timestamp |
+| `expires_at` | timestamp | Token expiration |
+
+**Relations:**
+- Belongs to `users`
+
+**Notes:**
+- AdonisJS Auth system table
+- Tokens stored hashed, never plain text
+
+---
+
+### `callsheets`
+
+Information sheets (call sheets) for projects, shared with participants.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `version` | varchar(255) | Version label (e.g. "v1", "v2.1") |
+| `project_id` | integer (FK) | References `projects.id` |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
+
+**Relations:**
+- Belongs to `projects`
+- Has many `content_callsheets` (content blocks)
+- Tracked by `seens` (participant views)
+
+**Notes:**
+- Publicly accessible via unique URL
+- `version` identifies latest version
+
+---
+
+### `composers`
+
+Composers in the global repertoire database.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `short_name` | varchar(255) | Short name (e.g. "Bach") |
+| `long_name` | varchar(255) | Full name (e.g. "Johann Sebastian Bach") |
+| `birth_date` | date | Birth date |
+| `death_date` | date | Death date (nullable) |
+| `country` | varchar(255) | Country of origin |
+| `main_style` | varchar(255) | Primary musical style/period |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
+
+**Relations:**
+- Referenced by `pieces.composer_id`
+
+**Notes:**
+- Uses `short_name`/`long_name` (not `first_name`/`last_name`)
+
+---
+
+### `concerts`
+
+Concerts (performance events) associated with projects.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `start_date` | timestamp | Concert start date/time |
+| `comment` | text | Comments/notes (default: empty) |
+| `project_id` | integer (FK) | References `projects.id` |
+| `place` | varchar(255) | Venue/location |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
+| `end_date` | timestamp | Concert end date/time |
+
+**Relations:**
+- Belongs to `projects`
+- Linked to participants via `participates_in_concerts` (attendance)
+
+**Notes:**
+- Project can have multiple concerts
+- Concert name from parent project
+- Time span: `start_date` to `end_date`
+
+---
+
+### `contacts`
+
+Global contact directory: musicians, professionals, admin contacts.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `first_name` | varchar(255) | First name (required) |
+| `last_name` | varchar(255) | Last name (required) |
+| `email` | varchar(255) | Email (default: empty) |
+| `phone` | varchar(255) | Phone (default: empty) |
+| `messenger` | varchar(255) | Messenger handle (default: empty) |
+| `comments` | text | Internal notes (default: empty) |
+| `validated` | boolean | Contact validated (required, default: false) |
+| `subscribed` | boolean | Subscribed to emails (required, default: true) |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
+
+**Relations:**
+- Referenced by `participants.contact_id` (contact becomes participant when joining project)
+- Linked to instruments via `plays`
+- Can belong to multiple `lists` via `contacts_lists`
+
+**Notes:**
+- Central directory, single source of truth for contact info
+- Contact becomes `participant` when joining project (avoids duplication)
+
+---
+
+### `contacts_lists`
+
+Pivot table linking contacts to mailing lists.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `contact_id` | integer (FK, part of PK) | References `contacts.id` |
+| `list_id` | integer (FK, part of PK) | References `lists.id` |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
+
+**Primary Key:** Composite (`contact_id`, `list_id`)
+
+**Relations:**
+- Links `contacts` to `lists`
+
+**Notes:**
+- Used for targeted mailing and contact filtering (e.g. "Professional violinists", "Alumni 2024")
+
+---
+
+### `contains`
+
+Pivot table linking files to folders (file system structure).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `folder_id` | integer (FK, part of PK) | References `folders.id` |
+| `file_id` | integer (FK, part of PK) | References `files.id` |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
+
+**Primary Key:** Composite (`folder_id`, `file_id`)
+
+**Relations:**
+- Links `folders` to `files`
+
+**Notes:**
+- Enables many-to-many (file could appear in multiple folders)
+- Coexists with `files.folder_id` FK (dual mechanism, historical)
+
+---
+
+### `content_callsheets`
+
+Content blocks (sections) for callsheets - modular title+text components.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `title` | varchar(255) | Block title/heading |
+| `text` | text | Rich HTML content (default: empty) |
+| `callsheet_id` | integer (FK) | References `callsheets.id` |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
+
+**Relations:**
+- Belongs to `callsheets`
+
+**Notes:**
+- Callsheet composed of multiple content blocks
+- Flexible page building (repeating title+text sections)
+
+---
+
+### `content_registrations`
+
+Content blocks (sections) for registration pages - modular title+text components.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `title` | varchar(255) | Block title/heading |
+| `text` | text | Rich HTML content (default: empty) |
+| `registration_id` | integer (FK) | References `registrations.id` |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
+
+**Relations:**
+- Belongs to `registrations`
+
+**Notes:**
+- Same pattern as `content_callsheets` for registration pages
+- Enables modular registration form building
+
+---
+
+### `expense_categories`
+
+Legacy accounting categories (predecessor to `accounting_categories`).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `name` | varchar(255) | Category name (required, unique) |
+| `description` | text | Optional description |
+| `is_default` | boolean | Default category (required, default: false) |
+| `color` | text | Color code for UI |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
+
+**Notes:**
+- Legacy system being replaced by `accounting_categories`
+- Still referenced by older code and deprecated `accounting.ts` model
+- Migration to new system incomplete
+- 10 default categories in English exist in production
+
+---
+
+### `files`
+
+Central file storage - all files used in application (scores, PDFs, uploads, documents).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `name` | varchar(255) | File name (required) |
+| `type` | varchar(255) | MIME type or file extension |
+| `content` | text | Inline file content for small files (default: empty) |
+| `path` | varchar(255) | File path on disk/storage |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
+| `size` | bigint | File size in bytes |
+| `folder_id` | integer (FK) | References `folders.id` (nullable) |
+| `project_id` | integer (FK) | References `projects.id` (nullable) |
+| `piece_id` | integer (FK) | References `pieces.id` (nullable) |
+| `material_id` | integer (FK) | References `materials.id` (nullable) |
+| `instrument_part` | varchar(255) | Instrument part label (e.g. "Violin I") |
+| `part_order` | integer | Order of parts (default: 0) |
+
+**Relations:**
+- Belongs to `folders` (file system hierarchy)
+- Can belong to `projects` (project-specific files)
+- Can belong to `pieces` (score/repertoire files)
+- Can belong to `materials` (specific edition/material files)
+- Referenced by many pivot tables: `contains`, `attached_to_callsheets`, `attached_to_mail_templates`, `audition_files`, `audition_pdf_files`, `section_pdfs`
+
+**Notes:**
+- Highly polymorphic (linked to multiple contexts)
+- Storage: inline (`content`) or filesystem (`path`)
+- `instrument_part` + `part_order` organize parts within scores
 
 ---
 
 ### `folders`
-Stores the folder structure used to organize files within the application. Folders can be nested and linked to a project or a specific piece.
 
-| Column              | Type      | Description                                       |
-|---------------------|-----------|---------------------------------------------------|
-| id                  | int PK    | Unique identifier                                 |
-| name                | string    | Name of the folder                                |
-| parent_id           | int FK    | References `folders.id` (parent folder, if any)  |
-| project_id          | int FK    | References `projects.id`                         |
-| piece_id            | int FK    | References `pieces.id`                           |
-| is_system_generated | boolean   | Whether the folder was auto-created by the system |
-| created_at          | timestamp | Creation date                                     |
-| updated_at          | timestamp | Last update date                                  |
+Folder structure for organizing files. Folders can be nested and linked to project or piece.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `name` | string | Folder name |
+| `parent_id` | integer (FK) | References `folders.id` (parent folder, if any) |
+| `project_id` | integer (FK) | References `projects.id` |
+| `piece_id` | integer (FK) | References `pieces.id` |
+| `is_system_generated` | boolean | Auto-created by system |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `projects`
-- belongs to one `pieces`
-- can be nested inside another `folders` via `parent_id` (self-referencing)
+- Belongs to `projects`
+- Belongs to `pieces`
+- Can be nested inside another `folders` via `parent_id` (self-referencing)
 
 ---
 
 ### `forms`
-Stores the individual form fields or responses linked to a registration.
 
-| Column          | Type      | Description                        |
-|-----------------|-----------|------------------------------------|
-| id              | int PK    | Unique identifier                  |
-| text            | text      | Content or answer of the field     |
-| type            | string    | Type of form field                 |
-| registration_id | int FK    | References `registrations.id`      |
-| created_at      | timestamp | Creation date                      |
-| updated_at      | timestamp | Last update date                   |
+Individual form fields or responses linked to registration.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `text` | text | Content or answer of field |
+| `type` | string | Type of form field |
+| `registration_id` | integer (FK) | References `registrations.id` |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `registrations`
+- Belongs to `registrations`
 
 ---
 
 ### `instruments`
-Stores all the musical instruments used by contacts and participants.
 
-| Column     | Type      | Description                              |
-|------------|-----------|------------------------------------------|
-| id         | int PK    | Unique identifier                        |
-| name       | string    | Name of the instrument                   |
-| family     | string    | Instrument family (e.g. Strings, Brass)  |
-| created_at | timestamp | Creation date                            |
-| updated_at | timestamp | Last update date                         |
+Musical instruments used by contacts and participants.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `name` | string | Instrument name |
+| `family` | string | Instrument family (e.g. Strings, Brass) |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- linked to `contacts` via `plays`
-- linked to `sections` via `played_in_sections`
-- linked to `recommendeds` via `recommendeds_instruments`
+- Linked to `contacts` via `plays`
+- Linked to `sections` via `played_in_sections`
+- Linked to `recommendeds` via `recommendeds_instruments`
 
 ---
 
 ### `lists`
-Stores named lists used in the application for various organizational purposes.
 
-| Column     | Type      | Description       |
-|------------|-----------|-------------------|
-| id         | int PK    | Unique identifier |
-| name       | string    | Name of the list  |
-| created_at | timestamp | Creation date     |
-| updated_at | timestamp | Last update date  |
+Named lists for organizational purposes.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `name` | string | List name |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 ---
 
 ### `mail_templates`
-Stores reusable email templates used throughout the application (recruitment, registration, etc.).
 
-| Column     | Type      | Description                           |
-|------------|-----------|---------------------------------------|
-| id         | int PK    | Unique identifier                     |
-| name       | string    | Name of the template                  |
-| content    | text      | HTML or text content of the template  |
-| is_default | boolean   | Whether this is the default template  |
-| created_at | timestamp | Creation date                         |
-| updated_at | timestamp | Last update date                      |
+Reusable email templates (recruitment, registration, etc.).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `name` | string | Template name |
+| `content` | text | HTML or text content |
+| `is_default` | boolean | Default template |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- referenced by `outgoing_mails` via `mail_template_id`
+- Referenced by `outgoing_mails` via `mail_template_id`
 
 ---
 
 ### `materials`
-Stores the different editions or versions of a musical piece (sheet music, parts, etc.).
 
-| Column         | Type      | Description                                    |
-|----------------|-----------|------------------------------------------------|
-| id             | int PK    | Unique identifier                              |
-| piece_id       | int FK    | References `pieces.id`                        |
-| name           | string    | Name of the material/edition                   |
-| description    | text      | Optional description                           |
-| edition        | string    | Edition name or number                         |
-| editor         | string    | Name of the editor/publisher                   |
-| notes          | text      | Additional notes                               |
-| is_default     | boolean   | Whether this is the default material           |
-| is_active      | boolean   | Whether this material is currently active      |
-| files_count    | int       | Number of files attached to this material      |
-| projects_count | int       | Number of projects using this material         |
-| created_at     | timestamp | Creation date                                  |
-| updated_at     | timestamp | Last update date                               |
+Different editions or versions of musical piece (sheet music, parts, etc.).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `piece_id` | integer (FK) | References `pieces.id` |
+| `name` | string | Material/edition name |
+| `description` | text | Optional description |
+| `edition` | string | Edition name or number |
+| `editor` | string | Editor/publisher name |
+| `notes` | text | Additional notes |
+| `is_default` | boolean | Default material |
+| `is_active` | boolean | Currently active |
+| `files_count` | integer | Files attached to material |
+| `projects_count` | integer | Projects using material |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `pieces`
-- referenced by `performed_ins` via `material_id`
+- Belongs to `pieces`
+- Referenced by `performed_ins` via `material_id`
 
 ---
 
 ### `outgoing_mails`
-Logs all outgoing emails sent by the application (recruitment messages, registration emails, etc.).
 
-| Column           | Type      | Description                              |
-|------------------|-----------|------------------------------------------|
-| id               | int PK    | Unique identifier                        |
-| type             | string    | Type/category of the email               |
-| receiver_id      | int FK    | References `contacts.id` (recipient)    |
-| project_id       | int FK    | References `projects.id`                |
-| mail_template_id | int FK    | References `mail_templates.id`          |
-| sent             | boolean   | Whether the email was successfully sent  |
-| created_at       | timestamp | Creation date                            |
-| updated_at       | timestamp | Last update date                         |
+Logs all outgoing emails (recruitment, registration, etc.).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `type` | string | Email type/category |
+| `receiver_id` | integer (FK) | References `contacts.id` (recipient) |
+| `project_id` | integer (FK) | References `projects.id` |
+| `mail_template_id` | integer (FK) | References `mail_templates.id` |
+| `sent` | boolean | Email sent successfully |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `mail_templates`
-- belongs to one `projects`
-- targets one `contacts` as receiver
+- Belongs to `mail_templates`
+- Belongs to `projects`
+- Targets one `contacts` as receiver
 
 ---
 
 ### `participants`
-Stores the musicians participating in a specific project. Each participant is linked to a contact (their identity) and a section.
 
-| Column                | Type      | Description                                             |
-|-----------------------|-----------|---------------------------------------------------------|
-| id                    | int PK    | Unique identifier                                       |
-| project_id            | int FK    | References `projects.id`                               |
-| contact_id            | int FK    | References `contacts.id`                               |
-| section_id            | int FK    | References `sections.id`                               |
-| accepted              | boolean   | Whether the participant has been accepted               |
-| last_activity         | timestamp | Date of their last activity in the app                 |
-| is_section_leader     | boolean   | Whether this participant is the section leader         |
-| audition_status       | text      | Status: none, pending, completed, expired              |
-| audition_requested_at | timestamp | When the audition was requested                        |
-| audition_deadline     | timestamp | Deadline for the audition                              |
-| created_at            | timestamp | Creation date                                           |
-| updated_at            | timestamp | Last update date                                        |
+Musicians participating in specific project. Each linked to contact (identity) and section.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `project_id` | integer (FK) | References `projects.id` |
+| `contact_id` | integer (FK) | References `contacts.id` |
+| `section_id` | integer (FK) | References `sections.id` |
+| `accepted` | boolean | Participant accepted |
+| `last_activity` | timestamp | Last activity date |
+| `is_section_leader` | boolean | Section leader |
+| `audition_status` | text | Status: none, pending, completed, expired |
+| `audition_requested_at` | timestamp | Audition request timestamp |
+| `audition_deadline` | timestamp | Audition deadline |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `projects`
-- belongs to one `contacts`
-- belongs to one `sections`
-- linked to `rehearsals` via `participates_ins`
-- linked to concerts via `participates_in_concerts`
+- Belongs to `projects`
+- Belongs to `contacts`
+- Belongs to `sections`
+- Linked to `rehearsals` via `participates_ins`
+- Linked to concerts via `participates_in_concerts`
 
 ---
 
 ### `participates_in_concerts`
-Junction table recording which participants take part in which concerts.
 
-| Column         | Type      | Description                          |
-|----------------|-----------|--------------------------------------|
-| participant_id | int PK FK | References `participants.id`         |
-| concert_id     | int PK FK | References the concert/callsheet     |
-| comment        | text      | Optional comment                     |
-| created_at     | timestamp | Creation date                        |
-| updated_at     | timestamp | Last update date                     |
+Junction table: which participants take part in which concerts.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `participant_id` | integer (PK, FK) | References `participants.id` |
+| `concert_id` | integer (PK, FK) | References concert/callsheet |
+| `comment` | text | Optional comment |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `participants`
-- belongs to one concert/callsheet
+- Belongs to `participants`
+- Belongs to concert/callsheet
 
 ---
 
 ### `participates_ins`
-Junction table recording which participants attend which rehearsals.
 
-| Column         | Type      | Description                      |
-|----------------|-----------|----------------------------------|
-| rehearsal_id   | int PK FK | References `rehearsals.id`       |
-| participant_id | int PK FK | References `participants.id`     |
-| comment        | text      | Optional attendance comment      |
-| created_at     | timestamp | Creation date                    |
-| updated_at     | timestamp | Last update date                 |
+Junction table: which participants attend which rehearsals.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `rehearsal_id` | integer (PK, FK) | References `rehearsals.id` |
+| `participant_id` | integer (PK, FK) | References `participants.id` |
+| `comment` | text | Optional attendance comment |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `rehearsals`
-- belongs to one `participants`
+- Belongs to `rehearsals`
+- Belongs to `participants`
 
 ---
 
 ### `performed_ins`
-Junction table linking pieces to the projects they are performed in, with ordering and material selection.
 
-| Column             | Type      | Description                               |
-|--------------------|-----------|-------------------------------------------|
-| project_id         | int PK FK | References `projects.id`                 |
-| piece_id           | int PK FK | References `pieces.id`                   |
-| order              | int       | Performance order within the project      |
-| material_id        | int FK    | References `materials.id`                |
-| material_specified | boolean   | Whether a specific material was chosen    |
-| created_at         | timestamp | Creation date                             |
-| updated_at         | timestamp | Last update date                          |
+Junction table linking pieces to projects, with ordering and material selection.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `project_id` | integer (PK, FK) | References `projects.id` |
+| `piece_id` | integer (PK, FK) | References `pieces.id` |
+| `order` | integer | Performance order within project |
+| `material_id` | integer (FK) | References `materials.id` |
+| `material_specified` | boolean | Specific material chosen |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `projects`
-- belongs to one `pieces`
-- belongs to one `materials`
+- Belongs to `projects`
+- Belongs to `pieces`
+- Belongs to `materials`
 
 ---
 
 ### `pieces`
-Stores all the musical pieces in the application's repertoire.
 
-| Column               | Type      | Description                                    |
-|----------------------|-----------|------------------------------------------------|
-| id                   | int PK    | Unique identifier                              |
-| name                 | string    | Title of the piece                             |
-| opus                 | string    | Opus number                                    |
-| year_of_composition  | string    | Year the piece was composed                    |
-| composer_id          | int FK    | References `contacts.id` (the composer)       |
-| type_of_piece_id     | int FK    | References `type_of_pieces.id`                |
-| folder_id            | int FK    | References `folders.id`                       |
-| arranger             | string    | Name of the arranger if applicable             |
-| selected_material_id | int FK    | References `materials.id` (default material)  |
-| created_at           | timestamp | Creation date                                  |
-| updated_at           | timestamp | Last update date                               |
+Musical pieces in application's repertoire.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `name` | string | Piece title |
+| `opus` | string | Opus number |
+| `year_of_composition` | string | Year composed |
+| `composer_id` | integer (FK) | References `composers.id` |
+| `type_of_piece_id` | integer (FK) | References `type_of_pieces.id` |
+| `folder_id` | integer (FK) | References `folders.id` |
+| `arranger` | string | Arranger name if applicable |
+| `selected_material_id` | integer (FK) | References `materials.id` (default material) |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `type_of_pieces`
-- belongs to one composer via `contacts`
-- belongs to one `folders`
-- has many `materials`
-- linked to `projects` via `performed_ins`
+- Belongs to `type_of_pieces`
+- Belongs to composer via `composers`
+- Belongs to `folders`
+- Has many `materials`
+- Linked to `projects` via `performed_ins`
 
 ---
 
 ### `played_in_sections`
-Junction table linking instruments to the sections they are played in.
 
-| Column        | Type      | Description                  |
-|---------------|-----------|------------------------------|
-| section_id    | int PK FK | References `sections.id`     |
-| instrument_id | int PK FK | References `instruments.id`  |
-| created_at    | timestamp | Creation date                |
-| updated_at    | timestamp | Last update date             |
+Junction table linking instruments to sections.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `section_id` | integer (PK, FK) | References `sections.id` |
+| `instrument_id` | integer (PK, FK) | References `instruments.id` |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `sections`
-- belongs to one `instruments`
+- Belongs to `sections`
+- Belongs to `instruments`
 
 ---
 
 ### `plays`
-Links a contact to the instrument(s) they play, with a proficiency level.
 
-| Column            | Type      | Description                              |
-|-------------------|-----------|------------------------------------------|
-| contact_id        | int PK FK | References `contacts.id`                |
-| instrument_id     | int PK FK | References `instruments.id`             |
-| proficiency_level | string    | Level of proficiency (default: unknown)  |
-| created_at        | timestamp | Creation date                            |
-| updated_at        | timestamp | Last update date                         |
+Links contact to instrument(s) they play, with proficiency level.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `contact_id` | integer (PK, FK) | References `contacts.id` |
+| `instrument_id` | integer (PK, FK) | References `instruments.id` |
+| `proficiency_level` | string | Proficiency level (default: unknown) |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `contacts`
-- belongs to one `instruments`
+- Belongs to `contacts`
+- Belongs to `instruments`
 
 ---
 
 ### `projects`
-Stores the musical projects managed in the application (concerts, seasons, etc.).
 
-| Column           | Type      | Description                      |
-|------------------|-----------|----------------------------------|
-| id               | int PK    | Unique identifier                |
-| name             | string    | Name of the project              |
-| section_group_id | int FK    | References `section_groups.id`   |
-| folder_id        | int FK    | References `folders.id`         |
-| created_at       | timestamp | Creation date                    |
-| updated_at       | timestamp | Last update date                 |
+Musical projects managed in application (concerts, seasons, etc.).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `name` | string | Project name |
+| `section_group_id` | integer (FK) | References `section_groups.id` |
+| `folder_id` | integer (FK) | References `folders.id` |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `section_groups`
-- belongs to one `folders`
-- has many `participants`
-- has many `rehearsals`
-- linked to `pieces` via `performed_ins`
-- linked to `contacts` via `responsibles`
-- has one `registrations`
-- has one `recruitment_settings`
+- Belongs to `section_groups`
+- Belongs to `folders`
+- Has many `participants`
+- Has many `rehearsals`
+- Linked to `pieces` via `performed_ins`
+- Linked to `contacts` via `responsibles`
+- Has one `registrations`
+- Has one `recruitment_settings`
 
 ---
 
 ### `recommendeds`
-Stores people recommended by existing members as potential recruits for a project, before a full recruitment record is created.
 
-| Column     | Type      | Description                              |
-|------------|-----------|------------------------------------------|
-| id         | int PK    | Unique identifier                        |
-| first_name | string    | First name of the recommended person    |
-| last_name  | string    | Last name of the recommended person     |
-| email      | string    | Email address                            |
-| phone      | string    | Phone number                             |
-| messenger  | string    | Messenger contact                        |
-| comment    | text      | Optional comment from the recommender   |
-| project_id | int FK    | References `projects.id`                |
-| created_at | timestamp | Creation date                            |
-| updated_at | timestamp | Last update date                         |
+People recommended by existing members as potential recruits, before full recruitment record created.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `first_name` | string | Recommended person first name |
+| `last_name` | string | Recommended person last name |
+| `email` | string | Email address |
+| `phone` | string | Phone number |
+| `messenger` | string | Messenger contact |
+| `comment` | text | Optional comment from recommender |
+| `project_id` | integer (FK) | References `projects.id` |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `projects`
-- linked to `instruments` via `recommendeds_instruments`
+- Belongs to `projects`
+- Linked to `instruments` via `recommendeds_instruments`
 
 ---
 
 ### `recommendeds_instruments`
-Junction table linking recommended people to the instruments they play.
 
-| Column         | Type      | Description                      |
-|----------------|-----------|----------------------------------|
-| recommended_id | int PK FK | References `recommendeds.id`     |
-| instrument_id  | int PK FK | References `instruments.id`      |
-| created_at     | timestamp | Creation date                    |
-| updated_at     | timestamp | Last update date                 |
+Junction table linking recommended people to instruments they play.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `recommended_id` | integer (PK, FK) | References `recommendeds.id` |
+| `instrument_id` | integer (PK, FK) | References `instruments.id` |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `recommendeds`
-- belongs to one `instruments`
+- Belongs to `recommendeds`
+- Belongs to `instruments`
 
 ---
 
 ### `recruitment_contacts`
-Stores the full recruitment pipeline for a project. Each record represents a person being actively recruited, with status and follow-up tracking.
 
-| Column                 | Type      | Description                                                                                                        |
-|------------------------|-----------|--------------------------------------------------------------------------------------------------------------------|
-| id                     | int PK    | Unique identifier                                                                                                  |
-| project_id             | int FK    | References `projects.id`                                                                                          |
-| contact_id             | int FK    | References `contacts.id` (if the person is already in the system)                                                |
-| first_name             | string    | First name                                                                                                         |
-| last_name              | string    | Last name                                                                                                          |
-| email                  | string    | Email address                                                                                                      |
-| phone                  | string    | Phone number                                                                                                       |
-| messenger              | string    | Messenger contact                                                                                                  |
-| section_id             | int FK    | References `sections.id` (target section)                                                                        |
-| status                 | text      | Recruitment status: not_yet_contacted, awaiting_response, to_follow_up, not_available, pending_validation, cancelled, recruited |
-| contact_method         | text      | How they were contacted: manual, email, messenger, phone                                                          |
-| contact_date           | timestamp | Date of first contact                                                                                              |
-| last_follow_up         | timestamp | Date of last follow-up                                                                                             |
-| notes                  | text      | Internal notes                                                                                                     |
-| recommended_by         | string    | Name of the person who recommended them                                                                           |
-| recommender_contact_id | int FK    | References `contacts.id` (the recommender)                                                                       |
-| is_duplicate           | boolean   | Whether this record is flagged as a duplicate                                                                     |
-| source                 | string    | How this person entered the pipeline                                                                               |
-| contacted_by           | string    | Who made the contact                                                                                               |
-| created_at             | timestamp | Creation date                                                                                                      |
-| updated_at             | timestamp | Last update date                                                                                                   |
+Full recruitment pipeline for project. Each record is person being actively recruited, with status and follow-up tracking.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `project_id` | integer (FK) | References `projects.id` |
+| `contact_id` | integer (FK) | References `contacts.id` (if in system) |
+| `first_name` | string | First name |
+| `last_name` | string | Last name |
+| `email` | string | Email address |
+| `phone` | string | Phone number |
+| `messenger` | string | Messenger contact |
+| `section_id` | integer (FK) | References `sections.id` (target section) |
+| `status` | text | not_yet_contacted, awaiting_response, to_follow_up, not_available, pending_validation, cancelled, recruited |
+| `contact_method` | text | How contacted: manual, email, messenger, phone |
+| `contact_date` | timestamp | First contact date |
+| `last_follow_up` | timestamp | Last follow-up date |
+| `notes` | text | Internal notes |
+| `recommended_by` | string | Recommender name |
+| `recommender_contact_id` | integer (FK) | References `contacts.id` (recommender) |
+| `is_duplicate` | boolean | Flagged as duplicate |
+| `source` | string | How entered pipeline |
+| `contacted_by` | string | Who made contact |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `projects`
-- belongs to one `contacts`
-- belongs to one `sections`
+- Belongs to `projects`
+- Belongs to `contacts`
+- Belongs to `sections`
 
 ---
 
 ### `recruitment_recommendations`
-Stores external recommendations submitted via a form, before they are processed into a `recruitment_contacts` record.
 
-| Column                 | Type      | Description                                                          |
-|------------------------|-----------|----------------------------------------------------------------------|
-| id                     | int PK    | Unique identifier                                                    |
-| project_id             | int FK    | References `projects.id`                                            |
-| recommender_name       | string    | Name of the person making the recommendation                        |
-| recommender_email      | string    | Email of the recommender                                             |
-| recommended_first_name | string    | First name of the recommended person                                |
-| recommended_last_name  | string    | Last name of the recommended person                                 |
-| recommended_email      | string    | Email of the recommended person                                     |
-| recommended_phone      | string    | Phone of the recommended person                                     |
-| recommended_messenger  | string    | Messenger contact                                                    |
-| recommended_instrument | string    | Instrument they play                                                 |
-| recommendation_message | text      | Message from the recommender                                         |
-| status                 | text      | Processing status: pending, ignored, contacted_email, contacted_manual |
-| recruitment_contact_id | int FK    | References `recruitment_contacts.id` once processed                |
-| created_at             | timestamp | Creation date                                                        |
-| updated_at             | timestamp | Last update date                                                     |
+External recommendations submitted via form, before processed into `recruitment_contacts`.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `project_id` | integer (FK) | References `projects.id` |
+| `recommender_name` | string | Recommender name |
+| `recommender_email` | string | Recommender email |
+| `recommended_first_name` | string | Recommended person first name |
+| `recommended_last_name` | string | Recommended person last name |
+| `recommended_email` | string | Recommended person email |
+| `recommended_phone` | string | Recommended person phone |
+| `recommended_messenger` | string | Messenger contact |
+| `recommended_instrument` | string | Instrument played |
+| `recommendation_message` | text | Recommender message |
+| `status` | text | pending, ignored, contacted_email, contacted_manual |
+| `recruitment_contact_id` | integer (FK) | References `recruitment_contacts.id` once processed |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `projects`
-- resolved into one `recruitment_contacts`
+- Belongs to `projects`
+- Resolved into `recruitment_contacts`
 
 ---
 
 ### `recruitment_settings`
-Stores per-project configuration for the recruitment module.
 
-| Column                 | Type      | Description                                       |
-|------------------------|-----------|---------------------------------------------------|
-| id                     | int PK    | Unique identifier                                 |
-| project_id             | int FK    | References `projects.id` (unique per project)    |
-| follow_up_days         | int       | Number of days before a follow-up is triggered   |
-| auto_follow_up_enabled | boolean   | Whether automatic follow-ups are enabled         |
-| auto_import_enabled    | boolean   | Whether automatic import of recommendations is on |
-| last_auto_import       | timestamp | Date of the last automatic import                 |
-| created_at             | timestamp | Creation date                                     |
-| updated_at             | timestamp | Last update date                                  |
+Per-project configuration for recruitment module.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `project_id` | integer (FK) | References `projects.id` (unique per project) |
+| `follow_up_days` | integer | Days before follow-up triggered |
+| `auto_follow_up_enabled` | boolean | Auto follow-ups enabled |
+| `auto_import_enabled` | boolean | Auto import recommendations enabled |
+| `last_auto_import` | timestamp | Last auto import date |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `projects` (one-to-one)
+- Belongs to `projects` (one-to-one)
 
 ---
 
 ### `registrations`
-Stores the registration form associated with a project, used to onboard new participants.
 
-| Column         | Type      | Description                           |
-|----------------|-----------|---------------------------------------|
-| id             | int PK    | Unique identifier                     |
-| project_id     | int FK    | References `projects.id`             |
-| last_send_date | timestamp | Date the registration was last sent   |
-| created_at     | timestamp | Creation date                         |
-| updated_at     | timestamp | Last update date                      |
+Registration form associated with project, for onboarding new participants.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `project_id` | integer (FK) | References `projects.id` |
+| `last_send_date` | timestamp | Registration last sent date |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `projects`
-- has many `forms`
+- Belongs to `projects`
+- Has many `forms`
 
 ---
 
 ### `rehearsals`
-Stores the rehearsal sessions associated with a project.
 
-| Column     | Type      | Description                           |
-|------------|-----------|---------------------------------------|
-| id         | int PK    | Unique identifier                     |
-| project_id | int FK    | References `projects.id`             |
-| start_date | timestamp | Start date and time of the rehearsal  |
-| end_date   | timestamp | End date and time of the rehearsal    |
-| place      | string    | Location of the rehearsal             |
-| comment    | text      | Optional comment                      |
-| created_at | timestamp | Creation date                         |
-| updated_at | timestamp | Last update date                      |
+Rehearsal sessions associated with project.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `project_id` | integer (FK) | References `projects.id` |
+| `start_date` | timestamp | Rehearsal start date/time |
+| `end_date` | timestamp | Rehearsal end date/time |
+| `place` | string | Rehearsal location |
+| `comment` | text | Optional comment |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `projects`
-- linked to `participants` via `participates_ins`
+- Belongs to `projects`
+- Linked to `participants` via `participates_ins`
 
 ---
 
 ### `responsibles`
-Links contacts to the projects they are responsible for (project managers, conductors, etc.).
 
-| Column     | Type      | Description                  |
-|------------|-----------|------------------------------|
-| project_id | int PK FK | References `projects.id`     |
-| contact_id | int PK FK | References `contacts.id`     |
-| created_at | timestamp | Creation date                |
-| updated_at | timestamp | Last update date             |
+Links contacts to projects they are responsible for (project managers, conductors, etc.).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `project_id` | integer (PK, FK) | References `projects.id` |
+| `contact_id` | integer (PK, FK) | References `contacts.id` |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `projects`
-- belongs to one `contacts`
+- Belongs to `projects`
+- Belongs to `contacts`
 
 ---
 
 ### `saves`
-Stores miscellaneous application-level key-value settings and configuration variables.
 
-| Column     | Type      | Description                   |
-|------------|-----------|-------------------------------|
-| id         | int PK    | Unique identifier             |
-| variable   | string    | Name of the setting/variable  |
-| value      | string    | Value of the setting          |
-| created_at | timestamp | Creation date                 |
-| updated_at | timestamp | Last update date              |
+Application-level key-value settings and configuration variables.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `variable` | string | Setting/variable name |
+| `value` | string | Setting value |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 ---
 
 ### `section_groups`
-Groups multiple sections together under a named group (e.g. "Orchestra", "Choir").
 
-| Column     | Type      | Description              |
-|------------|-----------|--------------------------|
-| id         | int PK    | Unique identifier        |
-| name       | string    | Name of the group        |
-| created_at | timestamp | Creation date            |
-| updated_at | timestamp | Last update date         |
+Groups multiple sections together (e.g. "Orchestra", "Choir").
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `name` | string | Group name |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- referenced by `projects` via `section_group_id`
-- linked to `sections` via `section_section_groups`
+- Referenced by `projects` via `section_group_id`
+- Linked to `sections` via `section_section_groups`
 
 ---
 
 ### `section_pdfs`
-Stores PDF files assigned to a section within a project (e.g. sheet music parts for auditions).
 
-| Column          | Type      | Description                                   |
-|-----------------|-----------|-----------------------------------------------|
-| id              | int PK    | Unique identifier                             |
-| project_id      | int FK    | References `projects.id`                     |
-| section_id      | int FK    | References `sections.id`                     |
-| file_id         | int FK    | References the file                           |
-| title           | string    | Title of the PDF                              |
-| description     | text      | Optional description                          |
-| order           | int       | Display order                                 |
-| is_required     | boolean   | Whether this PDF is required for the section  |
-| is_active       | boolean   | Whether this PDF is currently active          |
-| auditions_count | int       | Number of auditions linked to this PDF        |
-| created_at      | timestamp | Creation date                                 |
-| updated_at      | timestamp | Last update date                              |
+PDF files assigned to section within project (e.g. sheet music parts for auditions).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `project_id` | integer (FK) | References `projects.id` |
+| `section_id` | integer (FK) | References `sections.id` |
+| `file_id` | integer (FK) | References file |
+| `title` | string | PDF title |
+| `description` | text | Optional description |
+| `order` | integer | Display order |
+| `is_required` | boolean | PDF required for section |
+| `is_active` | boolean | PDF currently active |
+| `auditions_count` | integer | Auditions linked to PDF |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `projects`
-- belongs to one `sections`
+- Belongs to `projects`
+- Belongs to `sections`
 
 ---
 
 ### `section_section_groups`
-Junction table linking sections to section groups, with an ordering field.
 
-| Column           | Type      | Description                      |
-|------------------|-----------|----------------------------------|
-| section_id       | int PK FK | References `sections.id`         |
-| section_group_id | int PK FK | References `section_groups.id`   |
-| order            | int       | Display order within the group   |
-| created_at       | timestamp | Creation date                    |
-| updated_at       | timestamp | Last update date                 |
+Junction table linking sections to section groups, with ordering.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `section_id` | integer (PK, FK) | References `sections.id` |
+| `section_group_id` | integer (PK, FK) | References `section_groups.id` |
+| `order` | integer | Display order within group |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `sections`
-- belongs to one `section_groups`
+- Belongs to `sections`
+- Belongs to `section_groups`
 
 ---
 
 ### `sections`
-Stores the orchestra or ensemble sections (e.g. Strings, Brass, Woodwinds, Percussion).
 
-| Column     | Type      | Description                               |
-|------------|-----------|-------------------------------------------|
-| id         | int PK    | Unique identifier                         |
-| name       | string    | Name of the section                       |
-| size       | int       | Expected number of musicians in the section |
-| created_at | timestamp | Creation date                             |
-| updated_at | timestamp | Last update date                          |
+Orchestra or ensemble sections (e.g. Strings, Brass, Woodwinds, Percussion).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `name` | string | Section name |
+| `size` | integer | Expected number of musicians |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- linked to `section_groups` via `section_section_groups`
-- linked to `instruments` via `played_in_sections`
-- referenced by `participants` via `section_id`
-- referenced by `recruitment_contacts` via `section_id`
-- referenced by `section_pdfs` via `section_id`
+- Linked to `section_groups` via `section_section_groups`
+- Linked to `instruments` via `played_in_sections`
+- Referenced by `participants` via `section_id`
+- Referenced by `recruitment_contacts` via `section_id`
+- Referenced by `section_pdfs` via `section_id`
 
 ---
 
 ### `seens`
-Tracks which participants have seen a given callsheet.
 
-| Column         | Type      | Description                      |
-|----------------|-----------|----------------------------------|
-| callsheet_id   | int PK FK | References the callsheet         |
-| participant_id | int PK FK | References `participants.id`     |
-| created_at     | timestamp | Creation date                    |
-| updated_at     | timestamp | Last update date                 |
+Tracks which participants have seen given callsheet.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `callsheet_id` | integer (PK, FK) | References callsheet |
+| `participant_id` | integer (PK, FK) | References `participants.id` |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `participants`
-- belongs to one callsheet
+- Belongs to `participants`
+- Belongs to callsheet
 
 ---
 
 ### `shared_folders`
-Stores public sharing links for folders, allowing external access via a unique token.
 
-| Column     | Type      | Description                              |
-|------------|-----------|------------------------------------------|
-| id         | int PK    | Unique identifier                        |
-| folder_id  | int FK    | References `folders.id`                 |
-| token      | string    | Unique public access token               |
-| view_count | int       | Number of times the link was accessed    |
-| is_active  | boolean   | Whether the share link is still active   |
-| expires_at | timestamp | Expiry date of the share link            |
-| created_at | timestamp | Creation date                            |
-| updated_at | timestamp | Last update date                         |
+Public sharing links for folders, allowing external access via unique token.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `folder_id` | integer (FK) | References `folders.id` |
+| `token` | string | Unique public access token |
+| `view_count` | integer | Link access count |
+| `is_active` | boolean | Share link active |
+| `expires_at` | timestamp | Share link expiry date |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- belongs to one `folders`
+- Belongs to `folders`
 
 ---
 
 ### `type_of_pieces`
-Stores the different categories of musical pieces (e.g. Symphony, Concerto, Sonata).
 
-| Column     | Type      | Description              |
-|------------|-----------|--------------------------|
-| id         | int PK    | Unique identifier        |
-| name       | string    | Unique name of the type  |
-| created_at | timestamp | Creation date            |
-| updated_at | timestamp | Last update date         |
+Categories of musical pieces (e.g. Symphony, Concerto, Sonata).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `name` | string | Type name (unique) |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
 
 **Relations:**
-- referenced by `pieces` via `type_of_piece_id`
+- Referenced by `pieces` via `type_of_piece_id`
 
 ---
 
 ### `users`
-Stores the application's authenticated users (administrators).
 
-| Column     | Type      | Description              |
-|------------|-----------|--------------------------|
-| id         | int PK    | Unique identifier        |
-| full_name  | string    | Full name of the user    |
-| email      | string    | Unique email address     |
-| password   | string    | Hashed password          |
-| created_at | timestamp | Creation date            |
-| updated_at | timestamp | Last update date         |
+Application's authenticated users (administrators).
 
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `full_name` | string | User full name |
+| `email` | string | Unique email address |
+| `password` | string | Hashed password |
+| `created_at` | timestamp | Record creation |
+| `updated_at` | timestamp | Last update |
+
+---
 
 ## Notes
 
-> ⚠️ The database schema is managed via **AdonisJS Lucid** migrations located in the `back` repository under `database/migrations/`. Always run migrations after pulling new changes:
-> ```bash
-> node ace migration:run
-> ```
+Schema managed via AdonisJS Lucid migrations in `back/database/migrations/`. Run `node ace migration:run` after pulling.
 
-> ℹ️ A legacy migration script written in Python is available in the `database` repository under `migrationScript/`. It was used to migrate data from the old Melomania database and is kept for historical reference only.
+Legacy Python migration script in `database/migrationScript/` (historical reference only).
+
+**Legacy:**
+- `expense_categories` is old accounting system, being replaced by `accounting_categories`
+- Migration incomplete, some code still references `expense_categories`
+
+**Known Issues:**
+- `attached_to_callsheets` has inverted foreign keys (migration bug), currently unused in UI
+
+**Technical Tables:**
+- `adonis_schema` and `adonis_schema_versions` are AdonisJS internal migration tracking
+- `auth_access_tokens` is AdonisJS Auth token storage
+
+**Architecture:**
+```
+contacts (global directory)
+  ↓
+participants (when contact joins project)
+  ↓
+projects -> concerts, rehearsals, callsheets, accounting, auditions
+  ↓
+pieces (repertoire) <- composers
+  ↓
+files (scores, documents) <- folders
+```
