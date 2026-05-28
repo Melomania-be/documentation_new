@@ -132,7 +132,27 @@ docker pull adminer
 docker compose up -d
 
 ```
-
+###  Docker Image Pull Failure (`EOF` / `failed to copy`)
+* **Symptom:** The `docker compose up` or `docker pull` command crashes abruptly (`EOF` error) while pulling the `postgres` or `adminer` images.
+* **Common causes:** Unstable experimental `containerd` feature on Windows, network saturation due to concurrent downloads, or a restrictive firewall.
+* **Solutions (try in order):**
+    1. **Disable containerd (Recommended on Windows):**
+        * Open Docker Desktop > **Settings** (Gear icon) > **General**.
+        * Uncheck the **"Use containerd for pulling and storing images"** option.
+        * Click **Apply & restart** and try a manual `docker pull` again.
+    2. **Limit concurrent downloads:**
+        * Go to Docker Desktop > **Settings** > **Docker Engine**.
+        * Add the line `"max-concurrent-downloads": 1,` to the JSON configuration.
+        * Click **Apply & restart**.
+    3. **Cleanup and Manual Pull:**
+       If the download was corrupted, clear the cache before trying again:
+       ```bash
+       docker compose down
+       docker system prune -f
+       docker pull postgres
+       docker pull adminer
+       ```
+    4. **Alternative Network:** If the error persists on your home router or corporate/university network, temporarily use a 4G/5G mobile hotspot to download the images to 100%.
 
 
 *Note: If the process continues to fail, try switching to a different network (e.g., a mobile hotspot), as restrictive corporate or university networks sometimes block Docker image downloads.*
