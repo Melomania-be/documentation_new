@@ -30,8 +30,20 @@ Contacts lists are used to write an email to a custom group of people. The app c
 ![Contact lists page](/img/using_the_app/contacts_lists.png)
 This page shows all existing lists and their members. The arrow on the right of every entry leads to the list details page.
 
-### [TO BE COMPLETED] List details page
-This page shows the details of one list, but is currently malfunctioning.
+### List details and modification page
+This page shows the details of a single list, including its name, creation/update timestamps, and the members currently in the list.
 
-### [TO BE COMPLETED] List creation page
-This page allows to create a list, but is currently malfunctioning.
+It allows you to:
+- **Change the List Name:** Modify the list name directly at the top.
+- **View Selected Contacts:** Review the members in a clean table layout listing their names, emails, and instruments.
+- **Remove Contacts:** Click the red trash button to remove a contact from the list.
+- **Save or Delete:** Commit your changes by clicking **Save**, or delete the entire list by clicking **Delete**.
+
+### List creation page
+This page lets you create a new contact list from scratch.
+
+To build your list:
+1. **Set a List Name:** Fill in the list name input field.
+2. **Search and Filter Contacts:** Use the **Advanced Query Builder** at the bottom of the page to filter your database contacts by instrument, project, or section.
+3. **Select Members:** Check the boxes next to the contacts you wish to add, then click **Add to List**.
+4. **Save the List:** Click **Save** in the top right to store the newly created list in the database.
