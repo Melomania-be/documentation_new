@@ -28,7 +28,13 @@ Contacts lists are used to write an email to a custom group of people. The app c
 
 ### Main lists page
 ![Contact lists page](/img/using_the_app/contacts_lists.png)
-This page shows all existing lists and their members. The arrow on the right of every entry leads to the list details page.
+This page serves as the dashboard for all custom contact lists and mailing groups. It has been fully updated to align with the database design system, featuring the premium ModuleHeader card and consistent table layout. 
+
+The main table displays all existing lists with:
+- **ID:** The unique list identifier.
+- **Name:** The custom name of the list.
+- **Contacts:** A preview of all the member names grouped in that list.
+- **Actions:** The navigation arrow on the right leads directly to the **List details and modification page**.
 
 ### List details and modification page
 This page shows the details of a single list, including its name, creation/update timestamps, and the members currently in the list.
