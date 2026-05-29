@@ -24,6 +24,8 @@ This page displays all the data stored about a person. At the top, it show the c
 This page is pretty self-explanatory and allow to create a contact by filling out all the basic fields. To retroactively indicate that the contact has played in a project, it needs to be manually added to the participants list of said project through the project management page.
 
 ## Contacts lists
+*Section edited by Borshon*
+
 Contacts lists are used to write an email to a custom group of people. The app can send an email to all participants of a project without needing to create a list, but if the user needs to send an email to a subgroup of the project (all strings, for instance), or outside the scope of one specific project, they need to make a list. There are three pages for lists: a main page with all the lists, a list creation page and a list details page.
 
 ### Main lists page
