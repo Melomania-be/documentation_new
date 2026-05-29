@@ -23,6 +23,15 @@ This page displays all the data stored about a person. At the top, it show the c
 ![Contact creation page](/img/using_the_app/contacts_creation.png)
 This page is pretty self-explanatory and allow to create a contact by filling out all the basic fields. To retroactively indicate that the contact has played in a project, it needs to be manually added to the participants list of said project through the project management page.
 
+## Contact validation page
+
+When a participant registration is validated and the corresponding contact does not yet exist in the database, the application allows the user to create the contact directly during the validation process.
+
+At this stage, the user can fill in the contact information and assign one or more instruments together with their proficiency level. This avoids having to create the contact first and then manually edit it afterwards to add instrument information.
+
+The contact is then created in the database with all the selected instruments and levels already attached.
+
+
 ## Contacts lists
 *Section edited by Borshon*
 

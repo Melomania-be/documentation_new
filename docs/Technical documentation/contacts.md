@@ -129,6 +129,7 @@ This page is used to manage contacts that are not validated yet.
 A contact can be:
 
 - validated directly
+- assigned instruments and proficiency levels before validation
 - deleted
 - compared with an existing contact
 - merged with another contact

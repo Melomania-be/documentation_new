@@ -92,7 +92,7 @@ A recruitment contact has a `status` that reflects its position in the recruitme
 | Recruited | The contact has been recruited |
 | Cancelled | The recruitment has been cancelled |
 
-In the code, the statuses are defined as a TypeScript union type in `recruitment_contact.ts` (model). They are hardcoded and cannot be changed without modifying the source code.
+The application provides 7 default statuses. In addition, project managers can create custom statuses that are stored in the database and are available only for the corresponding project.
 
 ### Custom statuses
 
