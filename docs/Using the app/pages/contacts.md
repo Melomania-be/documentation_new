@@ -37,6 +37,8 @@ The main table displays all existing lists with:
 - **Actions:** The navigation arrow on the right leads directly to the **List details and modification page**.
 
 ### List details and modification page
+![List details page](/img/using_the_app/contacts_list_details.png)
+
 This page shows the details of a single list, including its name, creation/update timestamps, and the members currently in the list.
 
 It allows you to:
@@ -46,6 +48,8 @@ It allows you to:
 - **Save or Delete:** Commit your changes by clicking **Save**, or delete the entire list by clicking **Delete**.
 
 ### List creation page
+![List creation page](/img/using_the_app/contacts_list_create.png)
+
 This page lets you create a new contact list from scratch.
 
 To build your list:
