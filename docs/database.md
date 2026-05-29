@@ -8,7 +8,7 @@ PostgreSQL relational database storing all Melomania data: projects, repertoire,
 
 - **Interactive schema:** 
 <iframe width="800" height="500" src='https://dbdiagram.io/e/6a0c1da89f1f8ec47b4d081c/6a0c1dae697f99c167ad3e22'> </iframe>
-- **Edit access:** https://dbdiagram.io/d (sign in with `melomaniadevmail@gmail.com`, OTP sent to email, password: `melomania_devMail1`)
+- **Edit access:** [https://dbdiagram.io/d](https://dbdiagram.io/d/database_diagram-6a0c1da89f1f8ec47b4d081c) (sign in with `melomaniadevmail@gmail.com`, OTP sent to email, password: `melomania_devMail1`)
 
 Based on database dump from May 19, 2026 (`dump_19-5-2026.sql`). This file can be found in the static/files folder of the documentation repository.
 
