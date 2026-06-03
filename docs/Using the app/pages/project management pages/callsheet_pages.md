@@ -78,3 +78,11 @@ This is the callsheet as musicians see it. It is a completely static public page
 - Use **"New callsheet from the last one"** when making small updates to avoid rewriting everything
 - You can notify all participants of an update via the **Mailing** tab → **"Send a callsheet notification"**
 - If a piece shows "Aucun fichier", go to the **Files** page to upload the score for that piece
+
+---
+
+## Test Log
+
+A complete test log for the callsheet feature is available for download. It covers 42 test cases including creating, editing, the public page, seen tracking, email notifications, score downloads and edge cases. All 8 bugs found during testing have been fixed.
+
+[Download the Callsheet Test Log](/files/callsheet-test-log.pdf)
