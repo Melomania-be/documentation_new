@@ -65,6 +65,6 @@ This page lets you create a new contact list from scratch.
 
 To build your list:
 1. **Set a List Name:** Fill in the list name input field.
-2. **Search and Filter Contacts:** Use the **Advanced Query Builder** at the bottom of the page to filter your database contacts by instrument, project, or section.
+2. **Search and Filter Contacts:** Use the filtering tools at the bottom of the page to search contacts by instrument, instrument family, or by project (using either the project ID or project name).
 3. **Select Members:** Check the boxes next to the contacts you wish to add, then click **Add to List**.
 4. **Save the List:** Click **Save** in the top right to store the newly created list in the database.
