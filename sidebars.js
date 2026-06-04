@@ -46,6 +46,7 @@ const sidebars = {
       type: 'category',
       label: 'Technical documentation',
       items: [
+        'Technical documentation/testing',
         'Technical documentation/contacts',
         'Technical documentation/callsheet',
         'Technical documentation/attendance',
