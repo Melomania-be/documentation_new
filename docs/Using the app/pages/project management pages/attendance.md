@@ -36,7 +36,7 @@ The table automatically optimizes the space to accommodate possible comments.
 Shows attendance for all concert events, with each concert displayed as a column header showing the venue and date.
 
 ### Rehearsals table
-Shows attendance for all rehearsal events, with each rehearsal displayed as a column header showing the venue and date range.
+Shows attendance for all rehearsal events. When several rehearsals happen on the same day, the date header is merged into one shared cell to keep the table easier to read. Each rehearsal still keeps its own venue and time below that shared date header.
 
 ---
 

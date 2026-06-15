@@ -125,6 +125,7 @@ Each table has:
 - A **diagonal header cell** (top-left, styled with a CSS diagonal line)
 - A **Section column** showing the participant's section
 - One **column per event** showing the venue and date/time
+- In the **Rehearsals** table, events are grouped by start date in the header. If several rehearsals happen on the same day, the date cell spans all related rehearsal columns, while each rehearsal still displays its own venue and time.
 
 For each participant row:
 - A **section header row** is inserted whenever the section changes
