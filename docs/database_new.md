@@ -6,7 +6,8 @@ The database is a **PostgreSQL** relational database. It stores all data related
 
 ### Schema Access
 
-- **Interactive schema:** https://dbdiagram.io/d/Schema-diagram-6a0c7d94697f99c167b3a5f3
+- **Interactive schema:** 
+<iframe width="560" height="315" src='https://dbdiagram.io/e/6a0c1da89f1f8ec47b4d081c/6a0c1dae697f99c167ad3e22'> </iframe>
 - **Edit access:** Sign in to https://dbdiagram.io/d using `melomaniadevmail@gmail.com` (OTP sent to email, password: `melomania_devMail1`)
 - **Based on:** Database dump from May 19, 2026 (`dump_19-5-2026.sql`)
 
