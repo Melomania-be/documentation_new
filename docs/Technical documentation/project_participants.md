@@ -57,6 +57,32 @@ If we remove a participant from a project, we have to clean up:
 
 ---
 
+## PDF export
+
+The participants of a project can be exported as a PDF file. The export is generated on the frontend using `jspdf` and `jspdf-autotable`. The generated text is in English.
+
+Frontend file:
+```txt
+front/src/routes/projects/[id]/management/participants/+page.svelte
+```
+
+On the participants page, an "Export PDF" button exports the full list of participants. The function `exportParticipantsPdf()` builds the PDF.
+
+The PDF shows the project name as a blue title, the export date on the right ("Exported on DD/MM/YYYY", `en-GB` format), and a table with one row per participant:
+
+| Column | Source |
+|---|---|
+| First name | `participant.contact.firstName` |
+| Last name | `participant.contact.lastName` |
+| Email | `participant.contact.email` |
+| Phone | `participant.contact.phone` |
+| Section | `participant.section.name` |
+
+When a participant is a section leader (`participant.isSectionLeader`), the text "(section leader)" is added after the section name.
+
+The table uses blue headers and alternating row colors. The file is saved as `participants-project-{id}.pdf`.
+
+
 ## Things to watch out for!
 
 *   **Don't forget the pivot columns!** If you write a new query fetching a participant's concerts or rehearsals, you MUST include `.pivotColumns(['comment'])`. If you don't, the app won't know if the person was absent or late because it won't load the comment from the pivot table.

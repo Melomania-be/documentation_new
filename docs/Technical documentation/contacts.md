@@ -584,6 +584,70 @@ updatedAt
 
 The `Contact` model provides getters for compatibility, but developers should pay attention when sending payloads back to the backend.
 
+## PDF export
+
+The Contacts feature allows exporting contact-related data as PDF files. The export is generated on the frontend using `jspdf` and `jspdf-autotable`. The generated text is in English.
+
+There is no shared PDF helper for this feature. Each page builds its own PDF directly.
+
+### Exporting a single contact
+
+Frontend file:
+```txt
+front/src/routes/contacts/[id]/+page.svelte
+```
+
+On the contact detail page, an export button opens a small panel with checkboxes to choose which fields to include. The function `exportPdf()` builds the PDF.
+
+Fields checked by default:
+- Email
+- Phone
+- Messenger
+- Comments
+- Instruments
+- Projects
+
+Fields unchecked by default:
+- Validated
+- Created on
+- Updated on
+
+The PDF starts with the contact full name as a blue title, a colored line below it, and an "Exported on DD/MM/YYYY" date on the right. Dates use the `en-GB` format.
+
+The data is split into up to three tables, each shown only if it has content:
+
+| Table | Source | Columns |
+|---|---|---|
+| Contact information | selected contact fields | Field, Value |
+| Instruments | `contact.instruments` | Instrument, Level |
+| Projects | `contact.participants` (project name) | Project |
+
+Tables use blue headers and alternating row colors. The file is saved as `contact-{id}.pdf`.
+
+Note: the projects table reads from `contact.participants`, because contacts are linked to projects through the `participants` table, not directly.
+
+### Exporting a contact list
+
+Frontend file:
+```txt
+front/src/routes/contacts/lists/[id]/+page.svelte
+```
+
+On the contact list page, an "Export PDF" button exports all the contacts of the list. The button fetches the list from `GET /api/lists/:id` directly, so it does not depend on the `ListModifier` component.
+
+The PDF shows the list name as a blue title, the export date, and a table with one row per contact:
+
+| Column | Source |
+|---|---|
+| First name | `contact.firstName` |
+| Last name | `contact.lastName` |
+| Email | `contact.email` |
+| Phone | `contact.phone` |
+| Instruments | `contact.instruments` (name and level) |
+
+The file is saved as `list-{id}.pdf`.
+
+
 ## How to modify this feature
 
 When modifying the Contacts feature:
