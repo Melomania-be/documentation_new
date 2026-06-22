@@ -19,7 +19,7 @@ At the top right there is a red **"Download PDF"** button that generates and dow
 
 ### How the table works
 
-This page generates an attendance table based on the registration forms filled in by participants. Participants are arranged by section, and sections are displayed in orchestral order.
+This page generates an attendance table based on the registration forms filled in by participants. Participants are arranged by section, and sections are displayed in orchestral order: strings first (violins, viola, cello, double bass, harp), then woodwinds, then brass, then percussion.
 
 The table has:
 - **Rows** — each participant, grouped by section. The section name appears as a bold grey header row before each group. If a participant is a **section leader**, their name is marked with a blue **(Leader)** badge.
