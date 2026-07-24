@@ -129,6 +129,7 @@ This page is used to manage contacts that are not validated yet.
 A contact can be:
 
 - validated directly
+- assigned instruments and proficiency levels before validation
 - deleted
 - compared with an existing contact
 - merged with another contact
@@ -147,7 +148,27 @@ front/src/routes/contacts/lists/[id]/+page.svelte
 
 Contact lists are used mainly for mailing. They allow users to group contacts and send emails to a custom set of people.
 
-The existing user documentation mentions that list creation and list detail pages may currently malfunction.
+These pages utilize a reusable frontend component `ListModifier.svelte` in either `create` or `modify` mode.
+
+The page integrates with `AdvancedFilterer` to enable query-based database filtering, sending advanced filters via POST payloads to retrieve specific subsets of contacts. The user can select contacts and add them to a newly designed tabular contact list display with row-by-row visibility of added members.
+
+## Shared frontend components
+
+### ListModifier
+
+Frontend file:
+
+```txt
+front/src/lib/components/list/ListModifier.svelte
+```
+
+`ListModifier` is the main reusable form component for creating and editing contact lists.
+
+It is used in two modes:
+- `create`
+- `modify`
+
+In `modify` mode, it fetches the existing list's data (including name and contact associations) and enables updating or deleting the list. The component displays added contacts in a responsive row-by-row table layout and renders the `AdvancedFilterer` below it to add new contacts to the list.
 
 ## Shared frontend component
 

@@ -1,6 +1,6 @@
 # TD - Composers & Pieces Feature
 
-*Edited by Stéphane*
+*Edited by Stéphane Chines*
 
 ## Overview
 
