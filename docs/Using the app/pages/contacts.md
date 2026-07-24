@@ -23,15 +23,48 @@ This page displays all the data stored about a person. At the top, it show the c
 ![Contact creation page](/img/using_the_app/contacts_creation.png)
 This page is pretty self-explanatory and allow to create a contact by filling out all the basic fields. To retroactively indicate that the contact has played in a project, it needs to be manually added to the participants list of said project through the project management page.
 
+## Contact validation page
+
+When a participant registration is validated and the corresponding contact does not yet exist in the database, the application allows the user to create the contact directly during the validation process.
+
+At this stage, the user can fill in the contact information and assign one or more instruments together with their proficiency level. This avoids having to create the contact first and then manually edit it afterwards to add instrument information.
+
+The contact is then created in the database with all the selected instruments and levels already attached.
+
+
 ## Contacts lists
+*Section edited by Borshon*
+
 Contacts lists are used to write an email to a custom group of people. The app can send an email to all participants of a project without needing to create a list, but if the user needs to send an email to a subgroup of the project (all strings, for instance), or outside the scope of one specific project, they need to make a list. There are three pages for lists: a main page with all the lists, a list creation page and a list details page.
 
 ### Main lists page
 ![Contact lists page](/img/using_the_app/contacts_lists.png)
-This page shows all existing lists and their members. The arrow on the right of every entry leads to the list details page.
+This page serves as the dashboard for all custom contact lists and mailing groups. It has been fully updated to align with the database design system, featuring the premium ModuleHeader card and consistent table layout. 
 
-### [TO BE COMPLETED] List details page
-This page shows the details of one list, but is currently malfunctioning.
+The main table displays all existing lists with:
+- **ID:** The unique list identifier.
+- **Name:** The custom name of the list.
+- **Contacts:** A preview of all the member names grouped in that list.
+- **Actions:** The navigation arrow on the right leads directly to the **List details and modification page**.
 
-### [TO BE COMPLETED] List creation page
-This page allows to create a list, but is currently malfunctioning.
+### List details and modification page
+![List details page](/img/using_the_app/contacts_list_details.png)
+
+This page shows the details of a single list, including its name, creation/update timestamps, and the members currently in the list.
+
+It allows you to:
+- **Change the List Name:** Modify the list name directly at the top.
+- **View Selected Contacts:** Review the members in a clean table layout listing their names, emails, and instruments.
+- **Remove Contacts:** Click the red trash button to remove a contact from the list.
+- **Save or Delete:** Commit your changes by clicking **Save**, or delete the entire list by clicking **Delete**.
+
+### List creation page
+![List creation page](/img/using_the_app/contacts_list_create.png)
+
+This page lets you create a new contact list from scratch.
+
+To build your list:
+1. **Set a List Name:** Fill in the list name input field.
+2. **Search and Filter Contacts:** Use the filtering tools at the bottom of the page to search contacts by instrument, instrument family, or by project (using either the project ID or project name).
+3. **Select Members:** Check the boxes next to the contacts you wish to add, then click **Add to List**.
+4. **Save the List:** Click **Save** in the top right to store the newly created list in the database.
