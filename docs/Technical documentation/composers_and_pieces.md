@@ -1,6 +1,6 @@
 # TD - Composers & Pieces Feature
 
-*Created following mailing feature documentation style*
+*Edited by Stéphane*
 
 ## Overview
 

@@ -55,7 +55,14 @@ const sidebars = {
         'Technical documentation/usersmanagement',
         'Technical documentation/composers_and_pieces',
         'Technical documentation/mailing',
-        'Technical documentation/project_participants'
+        'Technical documentation/project_participants',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Mobile',
+      items: [
+        'Technical documentation/mobile_notifications',
       ],
     },
   ],
