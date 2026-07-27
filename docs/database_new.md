@@ -689,3 +689,48 @@ files (scores, documents) ← folders
 ---
 
 *This documentation covers tables from `accounting_categories` through `files`. Tables from `folders` onward are documented in the next section.*
+
+
+---
+
+## Multi-Tenant Architecture (Added July 2026)
+
+A multi-tenant architecture has been implemented using the shared schema approach. All organizations share the same database tables, but tenant-specific tables now have an `organization_id` column.
+
+### New Table: `organizations`
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer (PK) | Unique identifier |
+| `name` | varchar(255) | Organization name (unique, required) |
+| `created_at` | timestamp | Record creation timestamp |
+| `updated_at` | timestamp | Last update timestamp |
+
+### Tables with `organization_id` added
+
+The following tables now have an `organization_id` foreign key referencing `organizations.id` (nullable, SET NULL on delete):
+
+- `users`
+- `contacts`
+- `projects`
+- `lists`
+- `mail_templates`
+- `files`
+- `folders`
+- `section_groups`
+- `pieces`
+- `forms`
+- `outgoing_mails`
+- `accounting_categories`
+- `accounting_settings`
+- `accounting_entries`
+- `recruitment_settings`
+
+### Shared Global Tables (no `organization_id`)
+
+- `composers`, `instruments`, `type_of_pieces` — shared reference data
+- `callsheets`, `participants`, `concerts`, `rehearsals`, `recruitment_contacts` — inherit tenant isolation through their parent `project`
+
+For full details see the [Multi-Tenant Architecture technical documentation](../Technical%20documentation/multi_tenant_architecture.md).
+
+---
