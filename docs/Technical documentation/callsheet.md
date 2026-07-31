@@ -132,7 +132,7 @@ When saving an existing callsheet (with an `id` in the request body), the contro
 3. **Deletes all existing content blocks** (`await callsheet.related('contents').query().delete()`)
 4. Creates new content blocks from the request data
 
-> **Note:** Content blocks are fully deleted and recreated on every save — there is no partial update. This is why blocks cannot be reordered after creation (open issue #83 on the front repo).
+> **Note:** Content blocks are fully deleted and recreated on every save — there is no partial update. Each block keeps its order and position, which are re-sent on every save (see section 6).
 
 ### 4. The Public Callsheet Page
 The public callsheet is accessible at `/call_sheets/[callsheetId]/[visitorId]`. It is one of the only public pages in the app — no authentication required.
@@ -148,6 +148,18 @@ When a participant opens the callsheet:
 
 ### 5. Deleting a Callsheet
 A `DELETE` request to `/api/projects/:id/management/call_sheets/:callsheetId` deletes the callsheet and all its content blocks (cascade delete).
+
+### 6. Ordering and Positioning Content Blocks
+
+Since #208, each content block has two extra fields (see the `ContentCallsheet` type):
+- `order` (number): the display order of the block among the others.
+- `position` (`'above'` | `'below'`): whether the block is shown above or below the program & events section.
+
+In the callsheet editor (`CallsheetModifier.svelte`), the user can:
+- Reorder blocks with the ▲ / ▼ buttons (`moveUp` / `moveDown`). After each move, `order` is recomputed for every block.
+- Choose `above` / `below` for each block through a dropdown ("Above program & events" / "Below program & events").
+
+Both fields are sent with each block when saving. Note that this replaces the old behaviour described in issue #83, where blocks could not be reordered.
 
 ---
 
