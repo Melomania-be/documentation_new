@@ -12,9 +12,11 @@ The Attendance feature generates a read-only attendance report for a project, sh
 
 ### Frontend
 
-| Route | File | Description |
-|-------|------|-------------|
-| `/projects/[id]/management/attendance` | `src/routes/projects/[id]/management/attendance/+page.svelte` | The attendance report page |
+| File | Description |
+|------|-------------|
+| `src/routes/projects/[id]/management/attendance/+page.svelte` | The attendance report page |
+| `src/lib/utils/sectionOrder.ts` | Sorts participants by section in orchestral order |
+| `src/lib/utils/simplePdfGenerator.ts` | Frontend PDF generation utility (jsPDF) |
 
 ### Backend
 
@@ -23,13 +25,27 @@ The Attendance feature generates a read-only attendance report for a project, sh
 | `app/controllers/projects_controller.ts` | Contains the `getAttendance` method |
 | `app/models/rehearsal.ts` | Rehearsal model with participant pivot |
 | `app/models/concert.ts` | Concert model with participant pivot |
-| `src/lib/utils/simplePdfGenerator.ts` | Frontend PDF generation utility |
 
 ### API Endpoint
 
 | Method | Endpoint | Controller Method | Description |
 |--------|----------|-------------------|-------------|
 | `GET` | `/api/projects/:id/management/attendance` | `getAttendance` | Get attendance data for a project |
+
+---
+
+## Utilities
+
+### `sortParticipantsBySection` (`src/lib/utils/sectionOrder.ts`)
+
+Sorts an array of participants into standard orchestral section order. It is called on the frontend after the attendance data is fetched from the API.
+
+**Sort priority:**
+1. `section.pivot_order` — the `order` value from the `section_section_groups` pivot table, when present
+2. Hardcoded `SECTION_ORDER` fallback — strings (1st violin → double bass → harp), then woodwinds, then brass, then percussion
+3. Sections not matched get order `999` and appear last
+
+Matching against the fallback list is case-insensitive and fuzzy (`includes()`), so a name like "1st Violin" will match "first violin".
 
 ---
 
@@ -114,8 +130,9 @@ When the attendance page loads, the frontend calls `GET /api/projects/:id/manage
 The backend `getAttendance` method in `projects_controller.ts`:
 1. Fetches the project with all its rehearsals and concerts, preloading their participants and the pivot column `comment`
 2. Fetches all **accepted** participants with their contact and section data
-3. **Sorts participants** by section order (defined in the section group), then by section leader status (leaders first), then alphabetically by name
-4. Returns the project data with the sorted participants list
+3. Returns the raw participant list — **no sorting is done on the backend**
+
+After the response arrives, the frontend calls `sortParticipantsBySection()` from `src/lib/utils/sectionOrder.ts` to sort participants into orchestral section order before rendering the tables.
 
 ### 2. Displaying the Attendance Table
 
@@ -157,6 +174,6 @@ The PDF generator:
 
 - The attendance data is **read-only** — it comes from registration forms and cannot be edited from this page
 - The `comment` column on both pivot tables was added later via migrations `1727266510251` and `1727266611759` — if you need to add more pivot columns, follow the same pattern
-- Participants are sorted by their **section order** defined in the section group, not alphabetically by section name. This ensures the orchestral order is respected
+- Participants are sorted **on the frontend** by `sortParticipantsBySection()` in `src/lib/utils/sectionOrder.ts`. The sort uses the `order` column from `section_section_groups` when set, and falls back to a hardcoded orchestral order (strings → woodwinds → brass → percussion)
 - The PDF is generated **client-side** using jsPDF — no backend changes are needed to modify the PDF output, only changes to `simplePdfGenerator.ts`
 - Section leaders always appear first within their section, before other musicians
