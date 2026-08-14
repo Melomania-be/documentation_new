@@ -106,6 +106,7 @@ From the recipient side, the mailing feature is entirely passive: the recipient 
 | `POST` | `/api/mailing/sendRecommendedNotification` | `sendRecommendedNotification` | Send recommendation email to potential participant |
 | `POST` | `/api/mailing/sendRefusalEmailToParticipant` | `sendRefusalEmailToParticipant` | Send participation refusal email to participant |
 | `POST` | `/api/mailing/sendAuditionRequest` | `sendAuditionRequest` | Send audition request email to participant |
+| `POST` | `/api/mailing/sendMailToIndividualContacts` | `sendMailToIndividualContacts` | Send a custom email or template to a selected list of individual contacts |
 
 #### Default Templates Endpoints (authenticated)
 
@@ -113,6 +114,24 @@ From the recipient side, the mailing feature is entirely passive: the recipient 
 |--------|----------|-------------------|-------------|
 | `GET` | `/api/mailing/templates/default` | `getDefaultTemplates` | Get all system default email templates |
 | `PUT` | `/api/mailing/templates/default/edit` | `editDefaultTemplate` | Update a system default email template |
+
+### Sending to Individual Contacts
+
+The `sendMailToIndividualContacts` method (added in #201) sends an email to a
+hand-picked list of contacts, rather than to a whole list or all participants.
+
+It expects the following body:
+- `contactIds` (number[]): the IDs of the contacts to send to. If empty or missing, the endpoint returns a 400.
+- `type` (`'unique'` | `'template'`): whether to send a one-off custom message or a saved template.
+- `subject`, `content`: used when `type` is `'unique'`.
+- `templateId`: used when `type` is `'template'`.
+
+For each contact, the email is only sent if **all three** conditions are met:
+the contact has an email, `subscribed === true`, and `validated === true`.
+Contacts that don't match are silently skipped.
+
+Each successful send is recorded in the `outgoing_mails` table (with `receiver_id`,
+`type`, and `sent` status), like the other mailing methods.
 
 ---
 
@@ -201,3 +220,4 @@ The system automatically sends emails for certain events:
 - Complete logging of all sent emails
 - Tracking of notification types and timestamps
 - Status monitoring for recruitment and callsheet notifications
+
