@@ -65,6 +65,7 @@ const sidebars = {
         'Technical documentation/mobile',
         'Technical documentation/tasks',
         'Technical documentation/bug_fixes',
+        'Technical documentation/registration',
       ],
     },
   ],
