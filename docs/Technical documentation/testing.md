@@ -299,3 +299,32 @@ When you modify a feature, you must also update the corresponding test file. If 
 * Ensure your local PostgreSQL database is running.
 * Ensure you have run migrations and seeded the database using `node ace migration:run` and `node ace db:seed` in the `back/` folder.
 * Verify your backend environment settings in the `back/.env` file.
+
+## Current Test Coverage
+
+### Backend Tests (Japa)
+
+| Feature | Test File | Tests | Status |
+|---------|-----------|-------|--------|
+| Callsheet | tests/functional/callsheet.spec.ts | 6 | Passing |
+| Contacts | tests/functional/contacts.spec.ts | 13 | Passing |
+| Users | tests/functional/users.spec.ts | 6 | Passing |
+| Recruitment | tests/functional/recruitment.spec.ts | 6 | Passing |
+| Composers | tests/functional/composers.spec.ts | 5 | Passing |
+| Pieces | tests/functional/pieces.spec.ts | 4 | Passing |
+| Lists | tests/functional/lists.spec.ts | 6 | Passing |
+
+**Total: 46 backend tests**
+
+### Frontend Tests (Playwright)
+
+| Feature | Test File | Tests | Status |
+|---------|-----------|-------|--------|
+| Callsheet | tests/callsheet.spec.ts | 3 | Passing |
+| Contacts | tests/contacts.spec.ts | 3 | Passing |
+| Users | tests/users.spec.ts | 3 | Passing |
+| Library (Composers/Pieces) | tests/library.spec.ts | 3 | Passing |
+| Lists | tests/lists.spec.ts | 3 | Passing |
+| Recruitment | tests/recruitment.spec.ts | 3 | Passing |
+
+**Total: 18 frontend tests**
